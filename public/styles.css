@@ -152,3 +152,20 @@ svg { display: block; }
   align-items: center; gap: 18px; }
 .aside__rule { width: 64px; height: 1px; background: var(--l2); }
 .aside__text { font: italic 400 15px/1.6 'Instrument Sans', sans-serif; color: var(--tx2); max-width: 620px; text-align: center; }
+
+/* ---- Footer ---- */
+.footer { position: relative; overflow: hidden; }
+.footer__ridge { position: absolute; left: 0; bottom: 0; width: 100%; height: 240px; }
+.footer__inner { position: relative; z-index: 2; padding: 70px 96px 48px; display: flex; flex-direction: column; gap: 36px; }
+.footer__top { display: flex; align-items: center; justify-content: space-between; }
+.footer__headline { font: 600 34px/1.1 'Instrument Sans', sans-serif; color: var(--tx); letter-spacing: -.01em; }
+.footer__bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 8px; }
+.footer__links { display: flex; gap: 28px; }
+.footer__links a { font: 400 13px/1 'IBM Plex Mono', monospace; color: var(--tx); transition: color .15s ease; }
+.footer__links a:hover { color: var(--ac); }
+.footer__copy { font: 400 11px/1 'IBM Plex Mono', monospace; color: var(--tx); }
+@media (max-width: 768px) {
+  .footer__inner { padding: 60px 24px 40px; }
+  .footer__top, .footer__bottom { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .footer__links { flex-wrap: wrap; gap: 16px 28px; }
+}
