@@ -25,6 +25,18 @@
   src: url('fonts/ibm-plex-mono-v20-latin-600.woff2') format('woff2');
 }
 
+/* ---- Theme tokens ---- */
+:root, [data-theme="dark"] {
+  --bg: #0A1414; --l1: #1E4038; --l2: #37705C; --ac: #5FD4A0;
+  --wm: #E5B36A; --lk: rgba(95,212,160,.08); --tx: #F2F5F1; --tx2: #9FB8AB;
+  --cta-tx: var(--bg);
+}
+[data-theme="light"] {
+  --bg: #F7F6EF; --l1: #D5DCCB; --l2: #7FA08C; --ac: #1F7A4D;
+  --wm: #C08430; --lk: rgba(31,122,77,.08); --tx: #1C201C; --tx2: #5D685C;
+  --cta-tx: #F7F6EF;
+}
+
 /* ---- Reset / base ---- */
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }

@@ -1,6 +1,18 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
+  <script>
+    /* No-flash theme init. Mirrors resolveTheme() in theme.js. */
+    (function () {
+      try {
+        var s = localStorage.getItem('theme');
+        var t = (s === 'dark' || s === 'light')
+          ? s
+          : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mike Roberts</title>
@@ -10,5 +22,7 @@
 </head>
 <body>
   <main id="scaffold-marker">robertsmj.com scaffold</main>
+  <button data-theme-toggle type="button" aria-label="Toggle color theme">toggle</button>
+  <script type="module" src="/main.js"></script>
 </body>
 </html>
