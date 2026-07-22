@@ -1,4 +1,6 @@
 {
+  // Personal Cloudflare account (keeps deploys off the work account).
+  "account_id": "e83d83a0ee30710294a86fc2c61a035e",
   "name": "robertsmj",
   "compatibility_date": "2025-11-01",
   "assets": {
