@@ -7,10 +7,16 @@ function currentTheme() {
   return root.getAttribute('data-theme') === THEMES.LIGHT ? THEMES.LIGHT : THEMES.DARK;
 }
 
+const THEME_COLORS = { [THEMES.DARK]: '#0A1414', [THEMES.LIGHT]: '#F7F6EF' };
+
 function syncTogglePressed(theme) {
   const btn = document.querySelector('[data-theme-toggle]');
   if (btn) {
     btn.setAttribute('aria-pressed', String(theme === THEMES.DARK));
+  }
+  const meta = document.getElementById('theme-color-meta');
+  if (meta) {
+    meta.setAttribute('content', THEME_COLORS[theme]);
   }
 }
 

@@ -85,9 +85,10 @@ h1, h2 { margin: 0; }
 .nav a { font: 400 13px/1 'Instrument Sans', sans-serif; color: var(--tx2); transition: color .15s ease; }
 .nav a:hover { color: var(--tx); }
 .toggle { width: 34px; height: 18px; border: 1px solid var(--tx2); border-radius: 9px; background: none;
-  display: inline-flex; align-items: center; padding: 0 2px; cursor: pointer; justify-content: flex-end; }
-[data-theme="light"] .toggle { justify-content: flex-start; }
-.toggle__knob { width: 12px; height: 12px; border-radius: 50%; background: var(--ac); transition: all .2s ease; }
+  display: inline-flex; align-items: center; padding: 0 2px; cursor: pointer; justify-content: flex-start; }
+.toggle__knob { width: 12px; height: 12px; border-radius: 50%; background: var(--ac);
+  transform: translateX(16px); transition: transform .2s ease; }
+[data-theme="light"] .toggle__knob { transform: translateX(0); }
 @media (max-width: 768px) {
   .topbar { padding: 18px 20px; }
   .nav a { display: none; }
