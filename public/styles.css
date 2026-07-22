@@ -137,3 +137,18 @@ svg { display: block; }
   .content { padding: 80px 0 0; }
   .work-card { grid-template-columns: 1fr; gap: 16px; }
 }
+
+/* ---- Off the clock ---- */
+.hobby-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.hobby-card { border: 1px dashed var(--l2); border-radius: 8px; padding: 20px 22px;
+  display: flex; flex-direction: column; gap: 10px; transition: border-color .15s ease; }
+.hobby-card svg { width: 22px; height: 22px; color: var(--ac); }
+.hobby-card__title { font: 600 13px/1.3 'IBM Plex Mono', monospace; color: var(--tx); letter-spacing: .1em; }
+.hobby-card__body { font: 400 15px/1.6 'Instrument Sans', sans-serif; color: var(--tx2); }
+@media (max-width: 768px) { .hobby-grid { grid-template-columns: 1fr; } }
+
+/* ---- AI aside ---- */
+.aside { width: min(760px, 100% - 48px); margin: 96px auto 72px; display: flex; flex-direction: column;
+  align-items: center; gap: 18px; }
+.aside__rule { width: 64px; height: 1px; background: var(--l2); }
+.aside__text { font: italic 400 15px/1.6 'Instrument Sans', sans-serif; color: var(--tx2); max-width: 620px; text-align: center; }
