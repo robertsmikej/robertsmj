@@ -7,16 +7,16 @@ test('constants', () => {
   assert.equal(STORAGE_KEY, 'theme');
 });
 
-test('resolveTheme: stored value wins over system', () => {
-  assert.equal(resolveTheme('light', true), 'light');
-  assert.equal(resolveTheme('dark', false), 'dark');
+test('resolveTheme: stored value wins', () => {
+  assert.equal(resolveTheme('light'), 'light');
+  assert.equal(resolveTheme('dark'), 'dark');
 });
 
-test('resolveTheme: falls back to system when unset or invalid', () => {
-  assert.equal(resolveTheme(null, true), 'dark');
-  assert.equal(resolveTheme(null, false), 'light');
-  assert.equal(resolveTheme('purple', true), 'dark');
-  assert.equal(resolveTheme('', false), 'light');
+test('resolveTheme: defaults to dark when unset or invalid', () => {
+  assert.equal(resolveTheme(null), 'dark');
+  assert.equal(resolveTheme(undefined), 'dark');
+  assert.equal(resolveTheme('purple'), 'dark');
+  assert.equal(resolveTheme(''), 'dark');
 });
 
 test('nextTheme: flips', () => {

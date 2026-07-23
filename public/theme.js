@@ -1,11 +1,11 @@
 export const THEMES = { DARK: 'dark', LIGHT: 'light' };
 export const STORAGE_KEY = 'theme';
 
-export function resolveTheme(stored, systemPrefersDark) {
+export function resolveTheme(stored) {
   if (stored === THEMES.DARK || stored === THEMES.LIGHT) {
     return stored;
   }
-  return systemPrefersDark ? THEMES.DARK : THEMES.LIGHT;
+  return THEMES.DARK;
 }
 
 export function nextTheme(current) {

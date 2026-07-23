@@ -15,6 +15,11 @@
   src: url('fonts/instrument-sans-v4-latin-italic.woff2') format('woff2');
 }
 @font-face {
+  font-family: 'Instrument Serif';
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url('fonts/instrument-serif-v5-latin-regular.woff2') format('woff2');
+}
+@font-face {
   font-family: 'IBM Plex Mono';
   font-style: normal; font-weight: 400; font-display: swap;
   src: url('fonts/ibm-plex-mono-v20-latin-regular.woff2') format('woff2');
@@ -25,16 +30,16 @@
   src: url('fonts/ibm-plex-mono-v20-latin-600.woff2') format('woff2');
 }
 
-/* ---- Theme tokens ---- */
+/* ---- Theme tokens (Glacier cyan: slate-blue terrain, glacier accent, warm gold) ---- */
 :root, [data-theme="dark"] {
-  --bg: #0A1414; --l1: #1E4038; --l2: #37705C; --ac: #5FD4A0;
-  --wm: #E5B36A; --lk: rgba(95,212,160,.08); --tx: #F2F5F1; --tx2: #9FB8AB;
+  --bg: #0C1116; --l1: #2C3A44; --l2: #587482; --ac: #45B2E6;
+  --wm: #E5B36A; --lk: rgba(69,178,230,.08); --tx: #EDF2F6; --tx2: #93A6B3;
   --cta-tx: var(--bg);
 }
 [data-theme="light"] {
-  --bg: #F7F6EF; --l1: #D5DCCB; --l2: #7FA08C; --ac: #1F7A4D;
-  --wm: #C08430; --lk: rgba(31,122,77,.08); --tx: #1C201C; --tx2: #5D685C;
-  --cta-tx: #F7F6EF;
+  --bg: #F4F6F8; --l1: #D3DCE2; --l2: #8299A8; --ac: #14688B;
+  --wm: #C08430; --lk: rgba(20,104,139,.08); --tx: #182029; --tx2: #556572;
+  --cta-tx: #F4F6F8;
 }
 
 /* ---- Reset / base ---- */
@@ -68,6 +73,11 @@ h1, h2 { margin: 0; }
   transform: scale(var(--hero-scale, 1)); transform-origin: top left; }
 .hero__stage--mobile { width: 390px; display: none; }
 @media (max-width: 768px) {
+  /* One-screen hero: bottom-anchor the terrain so the mountains sit fully in
+     view and the empty sky above is cropped, instead of a fixed 760px canvas
+     that overflows the fold on tall phones (e.g. iPhone 15 Pro Max). */
+  .hero { height: 100vh; height: 100svh; }
+  .hero__stage { top: auto; bottom: 0; transform-origin: bottom left; }
   .hero__stage--desktop { display: none; }
   .hero__stage--mobile { display: block; }
 }
@@ -97,12 +107,12 @@ h1, h2 { margin: 0; }
 /* ---- Hero content ---- */
 .hero__content { position: absolute; left: 0; right: 0; top: 170px; z-index: 2;
   display: flex; flex-direction: column; gap: 26px; align-items: center; text-align: center; padding: 0 48px; }
-.hero__name { font: 600 80px/1.02 'Instrument Sans', sans-serif; color: var(--tx); letter-spacing: -.02em; }
+.hero__name { font: 400 92px/1.0 'Instrument Serif', Georgia, 'Times New Roman', serif; color: var(--tx); letter-spacing: -.01em; }
 .hero__sub { font: 400 22px/1.5 'Instrument Sans', sans-serif; color: var(--tx2); max-width: 560px; }
 .hero__cta { display: flex; align-items: center; gap: 24px; margin-top: 6px; }
 @media (max-width: 768px) {
-  .hero__content { top: 160px; align-items: flex-start; text-align: left; gap: 20px; left: 24px; right: 24px; padding: 0; }
-  .hero__name { font-size: 46px; line-height: 1.05; }
+  .hero__content { top: 150px; align-items: flex-start; text-align: left; gap: 20px; left: 24px; right: 24px; padding: 0; }
+  .hero__name { font-size: 54px; line-height: 1.0; }
   .hero__sub { font-size: 17px; line-height: 1.55; }
 }
 

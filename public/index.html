@@ -6,9 +6,7 @@
     (function () {
       try {
         var s = localStorage.getItem('theme');
-        var t = (s === 'dark' || s === 'light')
-          ? s
-          : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        var t = (s === 'dark' || s === 'light') ? s : 'dark';
         document.documentElement.setAttribute('data-theme', t);
       } catch (e) {}
     })();
@@ -17,7 +15,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mike Roberts, senior full-stack engineer</title>
   <meta name="description" content="Mike Roberts, senior full-stack engineer in Idaho. A/B testing infrastructure and theme platforms for high-volume Shopify storefronts.">
-  <meta name="theme-color" content="#0A1414" id="theme-color-meta">
+  <meta name="theme-color" content="#0C1116" id="theme-color-meta">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="https://robertsmj.com/">
   <meta property="og:type" content="website">
@@ -26,6 +24,7 @@
   <meta property="og:url" content="https://robertsmj.com/">
   <meta property="og:image" content="https://robertsmj.com/og.png">
   <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="/fonts/instrument-serif-v5-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/instrument-sans-v4-latin-600.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/instrument-sans-v4-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">

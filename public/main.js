@@ -7,7 +7,7 @@ function currentTheme() {
   return root.getAttribute('data-theme') === THEMES.LIGHT ? THEMES.LIGHT : THEMES.DARK;
 }
 
-const THEME_COLORS = { [THEMES.DARK]: '#0A1414', [THEMES.LIGHT]: '#F7F6EF' };
+const THEME_COLORS = { [THEMES.DARK]: '#0C1116', [THEMES.LIGHT]: '#F4F6F8' };
 
 function syncTogglePressed(theme) {
   const btn = document.querySelector('[data-theme-toggle]');
@@ -34,17 +34,24 @@ function initThemeToggle() {
 
 /* ---- Hero canvas scaling ----
    The hero is a fixed design canvas (1440x760 desktop, 390x760 mobile) so the
-   pixel-positioned animation overlays stay aligned. Scale it to viewport width. */
+   pixel-positioned animation overlays stay aligned. Scale it to viewport width.
+   On desktop the hero height tracks the scaled canvas; on mobile the height is
+   CSS-driven (100svh) with the terrain bottom-anchored, so we skip --hero-h. */
 const DESKTOP_W = 1440;
 const MOBILE_W = 390;
 const DESIGN_H = 760;
 const mobileQuery = matchMedia('(max-width: 768px)');
 
 function setHeroScale() {
-  const designW = mobileQuery.matches ? MOBILE_W : DESKTOP_W;
+  const isMobile = mobileQuery.matches;
+  const designW = isMobile ? MOBILE_W : DESKTOP_W;
   const scale = window.innerWidth / designW;
   root.style.setProperty('--hero-scale', String(scale));
-  root.style.setProperty('--hero-h', `${DESIGN_H * scale}px`);
+  if (isMobile) {
+    root.style.removeProperty('--hero-h');
+  } else {
+    root.style.setProperty('--hero-h', `${DESIGN_H * scale}px`);
+  }
 }
 
 function init() {
