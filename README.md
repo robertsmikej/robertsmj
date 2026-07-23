@@ -12,11 +12,16 @@ npm test         # node --test (theme logic unit tests)
 
 ## Deploy
 
+Pushing to `main` auto-deploys via GitHub Actions (`.github/workflows/deploy.yml`): it runs the tests, then `wrangler deploy` to the personal Cloudflare account. The account ID is pinned in `wrangler.jsonc`; the workflow only needs the `CLOUDFLARE_API_TOKEN` repo secret. You can also trigger it manually from the Actions tab (workflow_dispatch).
+
+To deploy by hand instead:
+
 ```bash
-npm run deploy   # wrangler deploy (assets-only Worker)
+# from a shell with the personal CF token exported (bare wrangler uses work OAuth)
+npm run deploy
 ```
 
-Note: this is a personal site. Deploy to the personal Cloudflare account (bare `wrangler` uses work OAuth). Attaching the `robertsmj.com` custom domain is a separate, gated step that must preserve the existing iCloud email DNS records: see the plan under `docs/superpowers/plans/`.
+Live at `https://robertsmj.com`. The custom domain runs through Cloudflare (nameservers `bingo`/`odin.ns.cloudflare.com`); the iCloud email DNS records (MX/SPF/apple-TXT/DKIM, DKIM kept DNS-only) are preserved. Migration detail is in the plan under `docs/superpowers/plans/`.
 
 ## Structure
 
