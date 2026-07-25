@@ -82,7 +82,7 @@ Owned by the handoff; implemented exactly:
 ## Responsive
 
 - `<=768px`: mobile hero layout (left-aligned, 24px gutters), nav collapses to wordmark + toggle (links hidden), mobile terrain symbol `#svgBm`.
-- Content below the hero (only the mobile *hero* was mocked): built to the handoff's prose, single column at 24px gutters, hobby grid to 1 column, footer stacked vertically. Content column `min(760px, 100% - 48px)`.
+- Content below the hero (only the mobile _hero_ was mocked): built to the handoff's prose, single column at 24px gutters, hobby grid to 1 column, footer stacked vertically. Content column `min(760px, 100% - 48px)`.
 
 ## Accessibility
 

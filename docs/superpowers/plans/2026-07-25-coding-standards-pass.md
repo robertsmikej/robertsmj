@@ -2,14 +2,14 @@
 
 Date: 2026-07-25
 Branch: `chore/coding-standards`
-Status: In progress
+Status: Done. See "Outcome" at the end for what changed against this plan.
 
 ## Why
 
 The site shipped fast and looks right, but it never got a standards pass. Concretely: no formatter,
 no linter, no static checking, no CI beyond "deploy runs `npm test`", 81 lines of JS with two silent
-`catch {}` blocks, 17 inline `style="..."` blobs in the hero, `<div>`s doing `<h3>`'s job, and exactly
-zero test coverage of `main.js` (the only file with real behavior).
+`catch {}` blocks, 16 inline `style="..."` blobs on the hero overlay spans, `<div>`s doing `<h3>`'s
+job, and exactly zero test coverage of `main.js` (the only file with real behavior).
 
 House standards come from `farmhand/resources/instructions.md` (injected into every session) plus its
 near-verbatim forks in `ab-testing`, `animal-apps`, `shopship`, and `campwatch/agents.md`. The
@@ -27,19 +27,19 @@ that personal projects skip the ClickUp and `[TECH-XXXXX]` workflow. Confirmed w
 
 ## House rules this pass enforces
 
-| Rule | Source |
-|---|---|
-| Max function length 20-25 lines | `instructions.md:51` |
-| Max 2 levels of nesting | `instructions.md:50` |
-| Guard clauses and early returns | `instructions.md:49,52` |
-| Constants for all magic values | `instructions.md:39` |
-| Strict equality always | `instructions.md:46` |
-| Braces around all control flow, no one-liner blocks | `instructions.md:47` |
-| Descriptive naming, no clever one-liners | `instructions.md:36-41` |
-| No superfluous comments; document non-obvious decisions | `shopship:64`, `instructions.md:75` |
-| Behavior-named tests, Arrange-Act-Assert, mock only at boundaries | `test-write/SKILL.md:104-111` |
-| Prettier is the formatter of record | `Animal Farm/AGENTS.md:43` |
-| WCAG 2.1 AA on customer-facing front-end | `review-agents/accessibility.md:12` |
+| Rule                                                              | Source                              |
+| ----------------------------------------------------------------- | ----------------------------------- |
+| Max function length 20-25 lines                                   | `instructions.md:51`                |
+| Max 2 levels of nesting                                           | `instructions.md:50`                |
+| Guard clauses and early returns                                   | `instructions.md:49,52`             |
+| Constants for all magic values                                    | `instructions.md:39`                |
+| Strict equality always                                            | `instructions.md:46`                |
+| Braces around all control flow, no one-liner blocks               | `instructions.md:47`                |
+| Descriptive naming, no clever one-liners                          | `instructions.md:36-41`             |
+| No superfluous comments; document non-obvious decisions           | `shopship:64`, `instructions.md:75` |
+| Behavior-named tests, Arrange-Act-Assert, mock only at boundaries | `test-write/SKILL.md:104-111`       |
+| Prettier is the formatter of record                               | `Animal Farm/AGENTS.md:43`          |
+| WCAG 2.1 AA on customer-facing front-end                          | `review-agents/accessibility.md:12` |
 
 Deliberate deviations, with reasons:
 
@@ -57,13 +57,28 @@ Deliberate deviations, with reasons:
 Two independent baselines on `wrangler dev`, so the refactor can be proven visually neutral:
 
 1. Screenshots: desktop dark, desktop light (`.superpowers/standards-pass/`).
-2. A deterministic DOM fingerprint: 155 elements × both themes × 28 geometry and computed-style
-   properties each, with every animation pinned via `animation-play-state: paused` and
-   `animation-delay: -1000s` so repeat runs are comparable. Stored in page `localStorage` under
-   `__fp_baseline` and diffed in-page after the changes land.
+2. A deterministic DOM fingerprint over every element, in both themes, comparing geometry and computed
+   style property by property.
 
 The fingerprint is the real gate. Screenshots catch gross breakage; the fingerprint catches a 0.5px
 shift or a changed easing curve.
+
+The first attempt at this got the method wrong in two ways worth recording, because both produced
+convincing-looking "regressions" that were artifacts:
+
+- **Pinning animations with `animation-play-state: paused` is not deterministic.** For infinite
+  animations, a paused element freezes wherever it happened to be when the style was injected, so
+  computed transforms and opacities differ between runs. The fix is `animation: none !important`, which
+  falls back to the base rule values. Animation _timings_ then have to be checked separately, as static
+  computed properties (name, duration, delay, easing, iteration count, fill mode), because that is the
+  one thing turning animations off cannot verify.
+- **`getBoundingClientRect` is viewport-relative, so scroll position leaks into the diff.** A page
+  scrolled 9.5px reported all 155 elements as shifted. Scroll to top before capturing.
+
+The working method: check out the pre-change commit into a git worktree, serve it under the _same_
+origin as the working copy, load both into identically sized iframes, and diff them in one JS context.
+Same origin means one script can read both documents, so only real differences come back rather than
+tens of KB of fingerprint that gets truncated in transit.
 
 ## Work
 
@@ -114,7 +129,7 @@ for, and strictly better than today's no-JS behavior. Guarded with `@supports`.
 
 - Delete the hero-scaling block (moved to CSS above). `main.js` becomes theme-toggle only.
 - `currentTheme()` reuses `resolveTheme()` instead of re-implementing the dark default.
-- Split `syncTogglePressed()` — it currently updates the button *and* the `theme-color` meta, which
+- Split `syncTogglePressed()` — it currently updates the button _and_ the `theme-color` meta, which
   its name does not say. Two named single-purpose functions.
 - Stop re-querying `[data-theme-toggle]` on every sync; resolve the element once.
 - Replace both `catch (e) {}` blocks. Empty catch is an ESLint `no-empty` violation and hides real
@@ -202,3 +217,44 @@ Tooling and CI first, so every later step is checked as it lands. Then the JS re
 (tests before the refactor where behavior is changing, per `refactor/SKILL.md:103`). Then CSS/HTML,
 which is the visually risky part, verified against the fingerprint. Docs last, describing what
 actually shipped.
+
+## Outcome
+
+Delivered as planned, with four deviations from the plan above:
+
+1. **`main.js` got split, not just trimmed.** The plan said "main.js becomes theme-toggle only". It
+   became a 22-line entry point with no logic at all, and the theme behavior moved to a new
+   `theme-toggle.js` that takes a `Document`. That is what made the toggle testable without mutating
+   globals between cases, and it matches `shopship:94` ("keep the routing layer free of logic").
+2. **The `theme-color` value stayed a literal instead of being read from computed `--bg`.** The plan
+   wanted CSS as the single source of truth. It cannot be: the meta tag's initial `content` has to be
+   correct before any stylesheet or script has run, so a literal exists in the HTML regardless. Reading
+   `--bg` at runtime would also have been untestable without a real browser. Keeping the literal and
+   adding `theme-color.test.js` to pin CSS, JS, and HTML together is both simpler and actually enforced.
+3. **Each hero stage now carries its own canvas width.** Driving the shared `--hero-canvas-w` was one
+   declaration shorter, but it sized the hidden stage as the other breakpoint's canvas. Harmless,
+   because that stage is `display: none`, but it was the single difference the fingerprint found, and
+   "correct only because nobody can see it" is not worth keeping.
+4. **Tests were mutation-checked.** All 57 passed on the first run, which is the point at which a test
+   suite deserves suspicion. Ten mutations (renamed SVG symbol, renamed section id, dropped
+   `rel="noopener"`, edited inline script without updating the CSP hash, diverged no-flash default,
+   drifted `--bg` in either theme, removed the toggle's accessible name, skipped a heading level,
+   reintroduced an inline style) were each applied, confirmed to fail the relevant spec, and reverted.
+   All ten were caught.
+
+Results:
+
+- 57 tests; 100% statement, branch, function, and line coverage of `theme.js`, `theme-toggle.js`, and
+  `main.js`.
+- `npm run check` green: Prettier, ESLint, `tsc --noEmit`, vitest.
+- 0 computed-style differences across 155 elements × 2 themes × 2 breakpoints, identical scroll heights
+  (3233 desktop, 4834 mobile). All 22 animated elements identical on every timing property.
+- Page verified working under the new CSP: inline theme script runs, stylesheet and fonts load, module
+  loads, toggle round-trips, skip link lands on `<main>`, console clean.
+
+Left undone on purpose:
+
+- The footer Resume link still 404s. It needs a PDF from Mike, not a code change.
+- The `--l1` card borders and light-theme `--l2` dashed borders sit under WCAG 1.4.11's 3:1. They are
+  decorative grouping rather than controls, so the criterion does not apply, and changing them is a
+  design decision. Recorded, not "fixed".

@@ -44,29 +44,31 @@
 ## Task 1: Scaffold and Cloudflare Worker config
 
 **Files:**
+
 - Create: `package.json`
 - Create: `wrangler.jsonc`
 - Create: `public/index.html`
 
 **Interfaces:**
+
 - Produces: a `public/` assets directory served by wrangler at `/`; npm scripts `dev`, `deploy`, `test`.
 
 - [ ] **Step 1: Create `package.json`**
 
 ```json
 {
-  "name": "robertsmj",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "test": "node --test"
-  },
-  "devDependencies": {
-    "wrangler": "^4"
-  }
+	"name": "robertsmj",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy",
+		"test": "node --test"
+	},
+	"devDependencies": {
+		"wrangler": "^4"
+	}
 }
 ```
 
@@ -74,11 +76,11 @@
 
 ```jsonc
 {
-  "name": "robertsmj",
-  "compatibility_date": "2025-01-01",
-  "assets": {
-    "directory": "./public"
-  }
+	"name": "robertsmj",
+	"compatibility_date": "2025-01-01",
+	"assets": {
+		"directory": "./public",
+	},
 }
 ```
 
@@ -87,14 +89,14 @@
 ```html
 <!doctype html>
 <html lang="en" data-theme="dark">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mike Roberts</title>
-</head>
-<body>
-  <main id="scaffold-marker">robertsmj.com scaffold</main>
-</body>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Mike Roberts</title>
+	</head>
+	<body>
+		<main id="scaffold-marker">robertsmj.com scaffold</main>
+	</body>
 </html>
 ```
 
@@ -120,10 +122,12 @@ git commit -m "Scaffold static site served by assets-only Cloudflare Worker"
 ## Task 2: Theme logic module (TDD)
 
 **Files:**
+
 - Create: `test/theme.test.js`
 - Create: `public/theme.js`
 
 **Interfaces:**
+
 - Produces:
   - `THEMES` = `{ DARK: 'dark', LIGHT: 'light' }`
   - `STORAGE_KEY` = `'theme'`
@@ -141,25 +145,25 @@ import assert from 'node:assert/strict';
 import { resolveTheme, nextTheme, THEMES, STORAGE_KEY } from '../public/theme.js';
 
 test('constants', () => {
-  assert.deepEqual(THEMES, { DARK: 'dark', LIGHT: 'light' });
-  assert.equal(STORAGE_KEY, 'theme');
+	assert.deepEqual(THEMES, { DARK: 'dark', LIGHT: 'light' });
+	assert.equal(STORAGE_KEY, 'theme');
 });
 
 test('resolveTheme: stored value wins over system', () => {
-  assert.equal(resolveTheme('light', true), 'light');
-  assert.equal(resolveTheme('dark', false), 'dark');
+	assert.equal(resolveTheme('light', true), 'light');
+	assert.equal(resolveTheme('dark', false), 'dark');
 });
 
 test('resolveTheme: falls back to system when unset or invalid', () => {
-  assert.equal(resolveTheme(null, true), 'dark');
-  assert.equal(resolveTheme(null, false), 'light');
-  assert.equal(resolveTheme('purple', true), 'dark');
-  assert.equal(resolveTheme('', false), 'light');
+	assert.equal(resolveTheme(null, true), 'dark');
+	assert.equal(resolveTheme(null, false), 'light');
+	assert.equal(resolveTheme('purple', true), 'dark');
+	assert.equal(resolveTheme('', false), 'light');
 });
 
 test('nextTheme: flips', () => {
-  assert.equal(nextTheme('dark'), 'light');
-  assert.equal(nextTheme('light'), 'dark');
+	assert.equal(nextTheme('dark'), 'light');
+	assert.equal(nextTheme('light'), 'dark');
 });
 ```
 
@@ -177,14 +181,14 @@ export const THEMES = { DARK: 'dark', LIGHT: 'light' };
 export const STORAGE_KEY = 'theme';
 
 export function resolveTheme(stored, systemPrefersDark) {
-  if (stored === THEMES.DARK || stored === THEMES.LIGHT) {
-    return stored;
-  }
-  return systemPrefersDark ? THEMES.DARK : THEMES.LIGHT;
+	if (stored === THEMES.DARK || stored === THEMES.LIGHT) {
+		return stored;
+	}
+	return systemPrefersDark ? THEMES.DARK : THEMES.LIGHT;
 }
 
 export function nextTheme(current) {
-  return current === THEMES.DARK ? THEMES.LIGHT : THEMES.DARK;
+	return current === THEMES.DARK ? THEMES.LIGHT : THEMES.DARK;
 }
 ```
 
@@ -205,17 +209,20 @@ git commit -m "Add tested theme resolution logic"
 ## Task 3: Self-hosted fonts and base stylesheet
 
 **Files:**
+
 - Create: `public/fonts/` (5 woff2 files)
 - Create: `public/styles.css`
 - Modify: `public/index.html` (link stylesheet, font preloads)
 
 **Interfaces:**
+
 - Produces: font families `'Instrument Sans'` and `'IBM Plex Mono'` available site-wide; a linked `styles.css` with a base reset and body defaults.
 - Consumed by: all later styling tasks.
 
 - [ ] **Step 1: Download the woff2 files**
 
 Run:
+
 ```bash
 cd /Users/mikeroberts/Code/robertsmj/public/fonts
 curl -sL "https://gwfh.mranftl.com/api/fonts/instrument-sans?download=zip&subsets=latin&variants=regular,600,italic&formats=woff2" -o is.zip
@@ -223,6 +230,7 @@ curl -sL "https://gwfh.mranftl.com/api/fonts/ibm-plex-mono?download=zip&subsets=
 unzip -o is.zip && unzip -o ipm.zip && rm is.zip ipm.zip
 ls
 ```
+
 Expected: five `.woff2` files (instrument-sans regular/600/italic; ibm-plex-mono regular/600). Note their exact filenames for Step 3. If the API is unavailable, fetch the Google Fonts css2 URL from the handoff with a desktop browser User-Agent, extract the `latin` woff2 URLs, and download those instead.
 
 - [ ] **Step 2: Create `public/styles.css` with font-face + base**
@@ -232,43 +240,64 @@ Use the exact filenames from Step 1 in the `src` URLs.
 ```css
 /* ---- Self-hosted fonts ---- */
 @font-face {
-  font-family: 'Instrument Sans';
-  font-style: normal; font-weight: 400; font-display: swap;
-  src: url('fonts/instrument-sans-v6-latin-regular.woff2') format('woff2');
+	font-family: 'Instrument Sans';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('fonts/instrument-sans-v6-latin-regular.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'Instrument Sans';
-  font-style: normal; font-weight: 600; font-display: swap;
-  src: url('fonts/instrument-sans-v6-latin-600.woff2') format('woff2');
+	font-family: 'Instrument Sans';
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+	src: url('fonts/instrument-sans-v6-latin-600.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'Instrument Sans';
-  font-style: italic; font-weight: 400; font-display: swap;
-  src: url('fonts/instrument-sans-v6-latin-italic.woff2') format('woff2');
+	font-family: 'Instrument Sans';
+	font-style: italic;
+	font-weight: 400;
+	font-display: swap;
+	src: url('fonts/instrument-sans-v6-latin-italic.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'IBM Plex Mono';
-  font-style: normal; font-weight: 400; font-display: swap;
-  src: url('fonts/ibm-plex-mono-v19-latin-regular.woff2') format('woff2');
+	font-family: 'IBM Plex Mono';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('fonts/ibm-plex-mono-v19-latin-regular.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'IBM Plex Mono';
-  font-style: normal; font-weight: 600; font-display: swap;
-  src: url('fonts/ibm-plex-mono-v19-latin-600.woff2') format('woff2');
+	font-family: 'IBM Plex Mono';
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+	src: url('fonts/ibm-plex-mono-v19-latin-600.woff2') format('woff2');
 }
 
 /* ---- Reset / base ---- */
-*, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--tx);
-  font-family: 'Instrument Sans', system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
 }
-a { color: inherit; text-decoration: none; }
-svg { display: block; }
+html {
+	scroll-behavior: smooth;
+}
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--tx);
+	font-family: 'Instrument Sans', system-ui, sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+a {
+	color: inherit;
+	text-decoration: none;
+}
+svg {
+	display: block;
+}
 ```
 
 (Token variables `--bg`/`--tx` are defined in Task 4; if a section is rendered before Task 4, the page shows unstyled colors, which is fine for this task's verification.)
@@ -278,9 +307,9 @@ svg { display: block; }
 Add inside `<head>` (after the `<title>`), using the two most-used weights for preload:
 
 ```html
-  <link rel="preload" href="/fonts/instrument-sans-v6-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/fonts/ibm-plex-mono-v19-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/styles.css">
+<link rel="preload" href="/fonts/instrument-sans-v6-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/ibm-plex-mono-v19-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/styles.css" />
 ```
 
 - [ ] **Step 4: Verify fonts load**
@@ -300,11 +329,13 @@ git commit -m "Self-host Instrument Sans and IBM Plex Mono, add base stylesheet"
 ## Task 4: Design tokens, no-flash theme init, and toggle
 
 **Files:**
+
 - Modify: `public/styles.css` (token sets)
 - Modify: `public/index.html` (no-flash inline script, load `main.js`)
 - Create: `public/main.js`
 
 **Interfaces:**
+
 - Consumes: `resolveTheme`, `nextTheme`, `THEMES`, `STORAGE_KEY` from `theme.js`.
 - Produces: `--bg --l1 --l2 --ac --wm --lk --tx --tx2` custom properties resolved per theme; a `[data-theme-toggle]` button contract (later tasks render the actual button in the top bar); `main.js` wires the toggle and sets `--hero-scale` (used in Task 5).
 
@@ -312,15 +343,28 @@ git commit -m "Self-host Instrument Sans and IBM Plex Mono, add base stylesheet"
 
 ```css
 /* ---- Theme tokens ---- */
-:root, [data-theme="dark"] {
-  --bg: #0A1414; --l1: #1E4038; --l2: #37705C; --ac: #5FD4A0;
-  --wm: #E5B36A; --lk: rgba(95,212,160,.08); --tx: #F2F5F1; --tx2: #9FB8AB;
-  --cta-tx: var(--bg);
+:root,
+[data-theme='dark'] {
+	--bg: #0a1414;
+	--l1: #1e4038;
+	--l2: #37705c;
+	--ac: #5fd4a0;
+	--wm: #e5b36a;
+	--lk: rgba(95, 212, 160, 0.08);
+	--tx: #f2f5f1;
+	--tx2: #9fb8ab;
+	--cta-tx: var(--bg);
 }
-[data-theme="light"] {
-  --bg: #F7F6EF; --l1: #D5DCCB; --l2: #7FA08C; --ac: #1F7A4D;
-  --wm: #C08430; --lk: rgba(31,122,77,.08); --tx: #1C201C; --tx2: #5D685C;
-  --cta-tx: #F7F6EF;
+[data-theme='light'] {
+	--bg: #f7f6ef;
+	--l1: #d5dccb;
+	--l2: #7fa08c;
+	--ac: #1f7a4d;
+	--wm: #c08430;
+	--lk: rgba(31, 122, 77, 0.08);
+	--tx: #1c201c;
+	--tx2: #5d685c;
+	--cta-tx: #f7f6ef;
 }
 ```
 
@@ -329,18 +373,16 @@ git commit -m "Self-host Instrument Sans and IBM Plex Mono, add base stylesheet"
 Place as the FIRST element inside `<head>` (before any stylesheet link) so it runs before first paint. It hand-inlines the same logic as `resolveTheme` (must stay in sync with `theme.js`):
 
 ```html
-  <script>
-    /* No-flash theme init. Mirrors resolveTheme() in theme.js. */
-    (function () {
-      try {
-        var s = localStorage.getItem('theme');
-        var t = (s === 'dark' || s === 'light')
-          ? s
-          : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', t);
-      } catch (e) {}
-    })();
-  </script>
+<script>
+	/* No-flash theme init. Mirrors resolveTheme() in theme.js. */
+	(function () {
+		try {
+			var s = localStorage.getItem('theme');
+			var t = s === 'dark' || s === 'light' ? s : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+			document.documentElement.setAttribute('data-theme', t);
+		} catch (e) {}
+	})();
+</script>
 ```
 
 Also remove the hardcoded `data-theme="dark"` from the `<html>` tag (the script now sets it); keep `lang="en"`.
@@ -350,7 +392,7 @@ Also remove the hardcoded `data-theme="dark"` from the `<html>` tag (the script 
 Add just before `</body>` in `index.html`:
 
 ```html
-  <script type="module" src="/main.js"></script>
+<script type="module" src="/main.js"></script>
 ```
 
 - [ ] **Step 4: Create `public/main.js`**
@@ -362,26 +404,28 @@ const root = document.documentElement;
 
 /* ---- Theme toggle ---- */
 function currentTheme() {
-  return root.getAttribute('data-theme') === THEMES.LIGHT ? THEMES.LIGHT : THEMES.DARK;
+	return root.getAttribute('data-theme') === THEMES.LIGHT ? THEMES.LIGHT : THEMES.DARK;
 }
 
 function syncTogglePressed(theme) {
-  const btn = document.querySelector('[data-theme-toggle]');
-  if (btn) {
-    btn.setAttribute('aria-pressed', String(theme === THEMES.DARK));
-  }
+	const btn = document.querySelector('[data-theme-toggle]');
+	if (btn) {
+		btn.setAttribute('aria-pressed', String(theme === THEMES.DARK));
+	}
 }
 
 function initThemeToggle() {
-  const btn = document.querySelector('[data-theme-toggle]');
-  if (!btn) return;
-  syncTogglePressed(currentTheme());
-  btn.addEventListener('click', () => {
-    const next = nextTheme(currentTheme());
-    try { localStorage.setItem(STORAGE_KEY, next); } catch (e) {}
-    root.setAttribute('data-theme', next);
-    syncTogglePressed(next);
-  });
+	const btn = document.querySelector('[data-theme-toggle]');
+	if (!btn) return;
+	syncTogglePressed(currentTheme());
+	btn.addEventListener('click', () => {
+		const next = nextTheme(currentTheme());
+		try {
+			localStorage.setItem(STORAGE_KEY, next);
+		} catch (e) {}
+		root.setAttribute('data-theme', next);
+		syncTogglePressed(next);
+	});
 }
 
 /* ---- Hero canvas scaling ----
@@ -393,23 +437,23 @@ const DESIGN_H = 760;
 const mobileQuery = matchMedia('(max-width: 768px)');
 
 function setHeroScale() {
-  const designW = mobileQuery.matches ? MOBILE_W : DESKTOP_W;
-  const scale = window.innerWidth / designW;
-  root.style.setProperty('--hero-scale', String(scale));
-  root.style.setProperty('--hero-h', `${DESIGN_H * scale}px`);
+	const designW = mobileQuery.matches ? MOBILE_W : DESKTOP_W;
+	const scale = window.innerWidth / designW;
+	root.style.setProperty('--hero-scale', String(scale));
+	root.style.setProperty('--hero-h', `${DESIGN_H * scale}px`);
 }
 
 function init() {
-  initThemeToggle();
-  setHeroScale();
-  window.addEventListener('resize', setHeroScale);
-  mobileQuery.addEventListener('change', setHeroScale);
+	initThemeToggle();
+	setHeroScale();
+	window.addEventListener('resize', setHeroScale);
+	mobileQuery.addEventListener('change', setHeroScale);
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
+	document.addEventListener('DOMContentLoaded', init);
 } else {
-  init();
+	init();
 }
 ```
 
@@ -418,7 +462,7 @@ if (document.readyState === 'loading') {
 Temporarily add inside `<body>` (removed/replaced by the real top bar in Task 5):
 
 ```html
-  <button data-theme-toggle type="button" aria-label="Toggle color theme">toggle</button>
+<button data-theme-toggle type="button" aria-label="Toggle color theme">toggle</button>
 ```
 
 - [ ] **Step 6: Verify toggle + persistence + no flash**
@@ -438,10 +482,12 @@ git commit -m "Add theme tokens, no-flash init, working theme toggle and hero-sc
 ## Task 5: SVG symbol library, hero, and terrain animations
 
 **Files:**
+
 - Modify: `public/index.html` (inline `<defs>`, hero markup)
 - Modify: `public/styles.css` (keyframes, hero layout, top bar, CTAs, toggle)
 
 **Interfaces:**
+
 - Consumes: token vars, `--hero-scale`, `--hero-h` from Task 4.
 - Produces: `#svgB`, `#svgBm`, glyph/schematic/hobby symbols available for `<use>` in later tasks; the real `[data-theme-toggle]` button in the top bar (replaces the temporary one).
 
@@ -453,69 +499,307 @@ Copy the entire `<svg width="0" height="0" ...><defs>...</defs></svg>` block ver
 
 ```css
 /* ---- Motion ---- */
-@keyframes wipe { to { clip-path: inset(0 0 0 0); } }
-@keyframes pulse { 0% { transform: scale(.4); opacity: .9; } 70% { transform: scale(2.2); opacity: 0; } 100% { transform: scale(2.2); opacity: 0; } }
-@keyframes travel { 0% { offset-distance: 0%; opacity: 0; } 4% { opacity: 1; } 92% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
-@keyframes drift { from { transform: translateY(0); } to { transform: translateY(-9px); } }
-@keyframes scan { 0% { opacity: .85; transform: translateX(0); } 80% { opacity: .6; } 100% { opacity: 0; transform: translateX(1438px); } }
-@keyframes scanM { 0% { opacity: .85; transform: translateX(0); } 80% { opacity: .6; } 100% { opacity: 0; transform: translateX(388px); } }
-@keyframes ridgeDraw { 0% { stroke-dashoffset: 1; opacity: 1; } 70% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
-@keyframes glint { 0%, 100% { opacity: 0; } 50% { opacity: .45; } }
-@keyframes smoke { 0% { transform: translate(0,0) scale(.6); opacity: 0; } 15% { opacity: .5; } 100% { transform: translate(7px,-46px) scale(1.5); opacity: 0; } }
+@keyframes wipe {
+	to {
+		clip-path: inset(0 0 0 0);
+	}
+}
+@keyframes pulse {
+	0% {
+		transform: scale(0.4);
+		opacity: 0.9;
+	}
+	70% {
+		transform: scale(2.2);
+		opacity: 0;
+	}
+	100% {
+		transform: scale(2.2);
+		opacity: 0;
+	}
+}
+@keyframes travel {
+	0% {
+		offset-distance: 0%;
+		opacity: 0;
+	}
+	4% {
+		opacity: 1;
+	}
+	92% {
+		opacity: 1;
+	}
+	100% {
+		offset-distance: 100%;
+		opacity: 0;
+	}
+}
+@keyframes drift {
+	from {
+		transform: translateY(0);
+	}
+	to {
+		transform: translateY(-9px);
+	}
+}
+@keyframes scan {
+	0% {
+		opacity: 0.85;
+		transform: translateX(0);
+	}
+	80% {
+		opacity: 0.6;
+	}
+	100% {
+		opacity: 0;
+		transform: translateX(1438px);
+	}
+}
+@keyframes scanM {
+	0% {
+		opacity: 0.85;
+		transform: translateX(0);
+	}
+	80% {
+		opacity: 0.6;
+	}
+	100% {
+		opacity: 0;
+		transform: translateX(388px);
+	}
+}
+@keyframes ridgeDraw {
+	0% {
+		stroke-dashoffset: 1;
+		opacity: 1;
+	}
+	70% {
+		stroke-dashoffset: 0;
+		opacity: 1;
+	}
+	100% {
+		stroke-dashoffset: 0;
+		opacity: 0;
+	}
+}
+@keyframes glint {
+	0%,
+	100% {
+		opacity: 0;
+	}
+	50% {
+		opacity: 0.45;
+	}
+}
+@keyframes smoke {
+	0% {
+		transform: translate(0, 0) scale(0.6);
+		opacity: 0;
+	}
+	15% {
+		opacity: 0.5;
+	}
+	100% {
+		transform: translate(7px, -46px) scale(1.5);
+		opacity: 0;
+	}
+}
 ```
 
 - [ ] **Step 3: Add hero layout, top bar, CTA and toggle styles to `styles.css`**
 
 ```css
 /* ---- Hero ---- */
-.hero { position: relative; height: var(--hero-h, 760px); overflow: hidden; }
-.hero__stage { position: absolute; top: 0; left: 0; width: 1440px; height: 760px;
-  transform: scale(var(--hero-scale, 1)); transform-origin: top left; }
-.hero__stage--mobile { width: 390px; display: none; }
-@media (max-width: 768px) {
-  .hero__stage--desktop { display: none; }
-  .hero__stage--mobile { display: block; }
+.hero {
+	position: relative;
+	height: var(--hero-h, 760px);
+	overflow: hidden;
 }
-.hero__terrain { position: absolute; inset: 0; animation: drift 9s ease-in-out 2.6s infinite alternate; }
-.hero__terrain use { clip-path: inset(0 100% 0 0); animation: wipe 1.6s cubic-bezier(.4,0,.2,1) .1s forwards; }
-.hero__ridge { position: absolute; inset: 0; pointer-events: none; }
-.hero__ridge path { fill: none; stroke: var(--ac); stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 1;
-  animation: ridgeDraw 2.4s cubic-bezier(.4,0,.2,1) .1s forwards; }
+.hero__stage {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 1440px;
+	height: 760px;
+	transform: scale(var(--hero-scale, 1));
+	transform-origin: top left;
+}
+.hero__stage--mobile {
+	width: 390px;
+	display: none;
+}
+@media (max-width: 768px) {
+	.hero__stage--desktop {
+		display: none;
+	}
+	.hero__stage--mobile {
+		display: block;
+	}
+}
+.hero__terrain {
+	position: absolute;
+	inset: 0;
+	animation: drift 9s ease-in-out 2.6s infinite alternate;
+}
+.hero__terrain use {
+	clip-path: inset(0 100% 0 0);
+	animation: wipe 1.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards;
+}
+.hero__ridge {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+}
+.hero__ridge path {
+	fill: none;
+	stroke: var(--ac);
+	stroke-width: 2;
+	stroke-dasharray: 1;
+	stroke-dashoffset: 1;
+	animation: ridgeDraw 2.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards;
+}
 
 /* ---- Top bar ---- */
-.topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 2;
-  display: flex; justify-content: space-between; align-items: center; padding: 22px 48px; }
-.wordmark { font: 600 13px/1 'IBM Plex Mono', monospace; color: var(--tx); letter-spacing: .04em; }
-.nav { display: flex; align-items: center; gap: 28px; }
-.nav a { font: 400 13px/1 'Instrument Sans', sans-serif; color: var(--tx2); transition: color .15s ease; }
-.nav a:hover { color: var(--tx); }
-.toggle { width: 34px; height: 18px; border: 1px solid var(--tx2); border-radius: 9px; background: none;
-  display: inline-flex; align-items: center; padding: 0 2px; cursor: pointer; justify-content: flex-end; }
-[data-theme="light"] .toggle { justify-content: flex-start; }
-.toggle__knob { width: 12px; height: 12px; border-radius: 50%; background: var(--ac); transition: all .2s ease; }
+.topbar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 2;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 22px 48px;
+}
+.wordmark {
+	font:
+		600 13px/1 'IBM Plex Mono',
+		monospace;
+	color: var(--tx);
+	letter-spacing: 0.04em;
+}
+.nav {
+	display: flex;
+	align-items: center;
+	gap: 28px;
+}
+.nav a {
+	font:
+		400 13px/1 'Instrument Sans',
+		sans-serif;
+	color: var(--tx2);
+	transition: color 0.15s ease;
+}
+.nav a:hover {
+	color: var(--tx);
+}
+.toggle {
+	width: 34px;
+	height: 18px;
+	border: 1px solid var(--tx2);
+	border-radius: 9px;
+	background: none;
+	display: inline-flex;
+	align-items: center;
+	padding: 0 2px;
+	cursor: pointer;
+	justify-content: flex-end;
+}
+[data-theme='light'] .toggle {
+	justify-content: flex-start;
+}
+.toggle__knob {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: var(--ac);
+	transition: all 0.2s ease;
+}
 @media (max-width: 768px) {
-  .topbar { padding: 18px 20px; }
-  .nav a { display: none; }
+	.topbar {
+		padding: 18px 20px;
+	}
+	.nav a {
+		display: none;
+	}
 }
 
 /* ---- Hero content ---- */
-.hero__content { position: absolute; left: 0; right: 0; top: 170px; z-index: 2;
-  display: flex; flex-direction: column; gap: 26px; align-items: center; text-align: center; padding: 0 48px; }
-.hero__name { font: 600 80px/1.02 'Instrument Sans', sans-serif; color: var(--tx); letter-spacing: -.02em; }
-.hero__sub { font: 400 22px/1.5 'Instrument Sans', sans-serif; color: var(--tx2); max-width: 560px; }
-.hero__cta { display: flex; align-items: center; gap: 24px; margin-top: 6px; }
+.hero__content {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 170px;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	gap: 26px;
+	align-items: center;
+	text-align: center;
+	padding: 0 48px;
+}
+.hero__name {
+	font:
+		600 80px/1.02 'Instrument Sans',
+		sans-serif;
+	color: var(--tx);
+	letter-spacing: -0.02em;
+}
+.hero__sub {
+	font:
+		400 22px/1.5 'Instrument Sans',
+		sans-serif;
+	color: var(--tx2);
+	max-width: 560px;
+}
+.hero__cta {
+	display: flex;
+	align-items: center;
+	gap: 24px;
+	margin-top: 6px;
+}
 @media (max-width: 768px) {
-  .hero__content { top: 160px; align-items: flex-start; text-align: left; gap: 20px; left: 24px; right: 24px; padding: 0; }
-  .hero__name { font-size: 46px; line-height: 1.05; }
-  .hero__sub { font-size: 17px; line-height: 1.55; }
+	.hero__content {
+		top: 160px;
+		align-items: flex-start;
+		text-align: left;
+		gap: 20px;
+		left: 24px;
+		right: 24px;
+		padding: 0;
+	}
+	.hero__name {
+		font-size: 46px;
+		line-height: 1.05;
+	}
+	.hero__sub {
+		font-size: 17px;
+		line-height: 1.55;
+	}
 }
 
 /* ---- Buttons ---- */
-.btn { background: var(--ac); color: var(--cta-tx); font: 600 15px/1 'Instrument Sans', sans-serif;
-  padding: 15px 26px; border-radius: 6px; transition: filter .15s ease; }
-.btn:hover { filter: brightness(1.08); }
-.textlink { font: 400 15px/1 'Instrument Sans', sans-serif; color: var(--tx);
-  border-bottom: 1px solid var(--l2); padding-bottom: 3px; }
+.btn {
+	background: var(--ac);
+	color: var(--cta-tx);
+	font:
+		600 15px/1 'Instrument Sans',
+		sans-serif;
+	padding: 15px 26px;
+	border-radius: 6px;
+	transition: filter 0.15s ease;
+}
+.btn:hover {
+	filter: brightness(1.08);
+}
+.textlink {
+	font:
+		400 15px/1 'Instrument Sans',
+		sans-serif;
+	color: var(--tx);
+	border-bottom: 1px solid var(--l2);
+	padding-bottom: 3px;
+}
 ```
 
 - [ ] **Step 4: Build the hero markup in `index.html`**
@@ -524,38 +808,48 @@ Replace the temporary toggle button with the hero. The desktop stage's terrain S
 
 ```html
 <header class="hero">
-  <!-- DESKTOP stage: terrain + ridge draw + overlay spans -->
-  <div class="hero__stage hero__stage--desktop">
-    <svg class="hero__terrain" width="1440" height="760"><use href="#svgB"></use></svg>
-    <svg class="hero__ridge" width="1440" height="760"><path pathLength="1" d="M0,610 L140,520 L300,600 L430,470 L560,588 L700,430 L840,580 L980,455 L1120,592 L1260,495 L1440,596"></path></svg>
-    <!-- Overlay spans: copy VERBATIM from design file lines 188-198 (scan line, lake glints,
+	<!-- DESKTOP stage: terrain + ridge draw + overlay spans -->
+	<div class="hero__stage hero__stage--desktop">
+		<svg class="hero__terrain" width="1440" height="760"><use href="#svgB"></use></svg>
+		<svg class="hero__ridge" width="1440" height="760">
+			<path
+				pathLength="1"
+				d="M0,610 L140,520 L300,600 L430,470 L560,588 L700,430 L840,580 L980,455 L1120,592 L1260,495 L1440,596"></path>
+		</svg>
+		<!-- Overlay spans: copy VERBATIM from design file lines 188-198 (scan line, lake glints,
          campfire, smoke rings, traveling amber dot, three peak pulses). -->
-  </div>
-  <!-- MOBILE stage -->
-  <div class="hero__stage hero__stage--mobile">
-    <svg class="hero__terrain" width="390" height="760"><use href="#svgBm"></use></svg>
-    <svg class="hero__ridge" width="390" height="760"><path pathLength="1" d="M0,640 L70,580 L140,632 L200,550 L260,624 L330,570 L390,634"></path></svg>
-    <!-- Overlay spans: copy VERBATIM from design file lines 146-150 (scanM, glint, travel dot, two pulses). -->
-  </div>
+	</div>
+	<!-- MOBILE stage -->
+	<div class="hero__stage hero__stage--mobile">
+		<svg class="hero__terrain" width="390" height="760"><use href="#svgBm"></use></svg>
+		<svg class="hero__ridge" width="390" height="760">
+			<path pathLength="1" d="M0,640 L70,580 L140,632 L200,550 L260,624 L330,570 L390,634"></path>
+		</svg>
+		<!-- Overlay spans: copy VERBATIM from design file lines 146-150 (scanM, glint, travel dot, two pulses). -->
+	</div>
 
-  <div class="topbar">
-    <span class="wordmark">robertsmj.com</span>
-    <nav class="nav">
-      <a href="#work">The work</a>
-      <a href="#off-the-clock">Off the clock</a>
-      <a href="#contact">Contact</a>
-      <button class="toggle" data-theme-toggle type="button" aria-label="Toggle color theme" aria-pressed="true"><span class="toggle__knob"></span></button>
-    </nav>
-  </div>
+	<div class="topbar">
+		<span class="wordmark">robertsmj.com</span>
+		<nav class="nav">
+			<a href="#work">The work</a>
+			<a href="#off-the-clock">Off the clock</a>
+			<a href="#contact">Contact</a>
+			<button class="toggle" data-theme-toggle type="button" aria-label="Toggle color theme" aria-pressed="true">
+				<span class="toggle__knob"></span>
+			</button>
+		</nav>
+	</div>
 
-  <div class="hero__content">
-    <div class="hero__name">Mike Roberts</div>
-    <div class="hero__sub">Senior full-stack engineer. Idaho roots, production systems, and dirt under the fingernails.</div>
-    <div class="hero__cta">
-      <a class="btn" href="mailto:mike@robertsmj.com">Hiring? Let's talk</a>
-      <a class="textlink" href="#work">The work &darr;</a>
-    </div>
-  </div>
+	<div class="hero__content">
+		<div class="hero__name">Mike Roberts</div>
+		<div class="hero__sub">
+			Senior full-stack engineer. Idaho roots, production systems, and dirt under the fingernails.
+		</div>
+		<div class="hero__cta">
+			<a class="btn" href="mailto:mike@robertsmj.com">Hiring? Let's talk</a>
+			<a class="textlink" href="#work">The work &darr;</a>
+		</div>
+	</div>
 </header>
 ```
 
@@ -578,10 +872,12 @@ git commit -m "Add SVG symbol library, animated terrain hero, top bar and CTAs"
 ## Task 6: WHAT I DO and SELECTED WORK sections
 
 **Files:**
+
 - Modify: `public/index.html` (two sections after the hero)
 - Modify: `public/styles.css` (content measure, kicker, prose, stack chips, work cards)
 
 **Interfaces:**
+
 - Consumes: token vars; symbols `#icTs #icShop #icCloud #icRemix #icGql #icNode #schAb #schTheme #schEdge`.
 - Produces: `#work` anchor target; `.wrap`, `.kicker`, `.rule` reused by Tasks 7-9.
 
@@ -589,30 +885,115 @@ git commit -m "Add SVG symbol library, animated terrain hero, top bar and CTAs"
 
 ```css
 /* ---- Content layout ---- */
-.wrap { width: min(760px, 100% - 48px); margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
-.content { display: flex; flex-direction: column; align-items: center; padding: 120px 0 0; }
-.rule { width: min(760px, 100% - 48px); height: 1px; background: var(--l1); margin: 88px auto; }
-.kicker { font: 600 12px/1 'IBM Plex Mono', monospace; color: var(--ac); letter-spacing: .16em; text-transform: uppercase; }
-.prose { font: 400 19px/1.7 'Instrument Sans', sans-serif; color: var(--tx); }
+.wrap {
+	width: min(760px, 100% - 48px);
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 28px;
+}
+.content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 120px 0 0;
+}
+.rule {
+	width: min(760px, 100% - 48px);
+	height: 1px;
+	background: var(--l1);
+	margin: 88px auto;
+}
+.kicker {
+	font:
+		600 12px/1 'IBM Plex Mono',
+		monospace;
+	color: var(--ac);
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+}
+.prose {
+	font:
+		400 19px/1.7 'Instrument Sans',
+		sans-serif;
+	color: var(--tx);
+}
 
 /* ---- Stack strip ---- */
-.stack { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; margin-top: 8px; }
-.stack span { display: inline-flex; align-items: center; gap: 8px; font: 400 13px/1 'IBM Plex Mono', monospace;
-  color: var(--tx2); letter-spacing: .08em; }
-.stack svg { width: 17px; height: 17px; color: var(--ac); }
+.stack {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px 22px;
+	margin-top: 8px;
+}
+.stack span {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font:
+		400 13px/1 'IBM Plex Mono',
+		monospace;
+	color: var(--tx2);
+	letter-spacing: 0.08em;
+}
+.stack svg {
+	width: 17px;
+	height: 17px;
+	color: var(--ac);
+}
 
 /* ---- Selected work ---- */
-.work-list { display: flex; flex-direction: column; gap: 18px; }
-.work-card { display: grid; grid-template-columns: 150px 1fr; gap: 28px; align-items: center;
-  border: 1px solid var(--l1); border-radius: 8px; padding: 20px 26px; transition: border-color .15s ease; }
-.work-card:hover { border-color: var(--l2); }
-.work-card__body { display: flex; flex-direction: column; gap: 8px; }
-.work-card__title { font: 600 18px/1.3 'Instrument Sans', sans-serif; color: var(--tx); }
-.work-card__desc { font: 400 15px/1.6 'Instrument Sans', sans-serif; color: var(--tx2); }
-.work-card__meta { font: 400 11px/1.5 'IBM Plex Mono', monospace; color: var(--ac); letter-spacing: .1em; }
+.work-list {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+.work-card {
+	display: grid;
+	grid-template-columns: 150px 1fr;
+	gap: 28px;
+	align-items: center;
+	border: 1px solid var(--l1);
+	border-radius: 8px;
+	padding: 20px 26px;
+	transition: border-color 0.15s ease;
+}
+.work-card:hover {
+	border-color: var(--l2);
+}
+.work-card__body {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+.work-card__title {
+	font:
+		600 18px/1.3 'Instrument Sans',
+		sans-serif;
+	color: var(--tx);
+}
+.work-card__desc {
+	font:
+		400 15px/1.6 'Instrument Sans',
+		sans-serif;
+	color: var(--tx2);
+}
+.work-card__meta {
+	font:
+		400 11px/1.5 'IBM Plex Mono',
+		monospace;
+	color: var(--ac);
+	letter-spacing: 0.1em;
+}
 @media (max-width: 768px) {
-  .content { padding: 80px 0 0; }
-  .work-card { grid-template-columns: 1fr; gap: 16px; }
+	.content {
+		padding: 80px 0 0;
+	}
+	.work-card {
+		grid-template-columns: 1fr;
+		gap: 16px;
+	}
 }
 ```
 
@@ -622,50 +1003,73 @@ Wrap all body sections below the hero in `<main class="content">`. Lift copy and
 
 ```html
 <main class="content">
-  <section class="wrap" aria-labelledby="whatido">
-    <div class="kicker" id="whatido">WHAT I DO</div>
-    <p class="prose">I lead a team building A/B testing infrastructure and theme platforms for high-volume Shopify storefronts. The job is shipping experiments to millions of sessions without breaking checkout. I care about systems that stay fast, measurable, and boring to operate. Fifteen years across the stack, the last several at e-commerce scale.</p>
-    <div class="stack">
-      <span><svg viewBox="0 0 24 24"><use href="#icTs"></use></svg>TYPESCRIPT</span>
-      <span><svg viewBox="0 0 24 24"><use href="#icShop"></use></svg>SHOPIFY / LIQUID</span>
-      <span><svg viewBox="0 0 24 24"><use href="#icCloud"></use></svg>CLOUDFLARE WORKERS</span>
-      <span><svg viewBox="0 0 24 24"><use href="#icRemix"></use></svg>REMIX</span>
-      <span><svg viewBox="0 0 24 24"><use href="#icGql"></use></svg>GRAPHQL</span>
-      <span><svg viewBox="0 0 24 24"><use href="#icNode"></use></svg>NODE</span>
-    </div>
-  </section>
+	<section class="wrap" aria-labelledby="whatido">
+		<div class="kicker" id="whatido">WHAT I DO</div>
+		<p class="prose">
+			I lead a team building A/B testing infrastructure and theme platforms for high-volume Shopify storefronts. The job
+			is shipping experiments to millions of sessions without breaking checkout. I care about systems that stay fast,
+			measurable, and boring to operate. Fifteen years across the stack, the last several at e-commerce scale.
+		</p>
+		<div class="stack">
+			<span
+				><svg viewBox="0 0 24 24"><use href="#icTs"></use></svg>TYPESCRIPT</span
+			>
+			<span
+				><svg viewBox="0 0 24 24"><use href="#icShop"></use></svg>SHOPIFY / LIQUID</span
+			>
+			<span
+				><svg viewBox="0 0 24 24"><use href="#icCloud"></use></svg>CLOUDFLARE WORKERS</span
+			>
+			<span
+				><svg viewBox="0 0 24 24"><use href="#icRemix"></use></svg>REMIX</span
+			>
+			<span
+				><svg viewBox="0 0 24 24"><use href="#icGql"></use></svg>GRAPHQL</span
+			>
+			<span
+				><svg viewBox="0 0 24 24"><use href="#icNode"></use></svg>NODE</span
+			>
+		</div>
+	</section>
 
-  <hr class="rule">
+	<hr class="rule" />
 
-  <section class="wrap" id="work" aria-labelledby="work-h">
-    <div class="kicker" id="work-h">SELECTED WORK</div>
-    <div class="work-list">
-      <article class="work-card">
-        <svg width="150" height="90" viewBox="0 0 150 90"><use href="#schAb"></use></svg>
-        <div class="work-card__body">
-          <div class="work-card__title">A/B testing platform</div>
-          <div class="work-card__desc">Server-side experimentation for high-volume storefronts, variant delivery at the edge, zero flicker, checkout untouched.</div>
-          <div class="work-card__meta">EDGE DELIVERY &middot; ZERO FLICKER &middot; MILLIONS OF SESSIONS</div>
-        </div>
-      </article>
-      <article class="work-card">
-        <svg width="150" height="90" viewBox="0 0 150 90"><use href="#schTheme"></use></svg>
-        <div class="work-card__body">
-          <div class="work-card__title">Theme platform</div>
-          <div class="work-card__desc">One Shopify theme architecture powering multiple brands from a single codebase.</div>
-          <div class="work-card__meta">ONE CODEBASE &middot; EVERY BRAND &middot; SHOPIFY / LIQUID</div>
-        </div>
-      </article>
-      <article class="work-card">
-        <svg width="150" height="90" viewBox="0 0 150 90"><use href="#schEdge"></use></svg>
-        <div class="work-card__body">
-          <div class="work-card__title">Edge tooling</div>
-          <div class="work-card__desc">Cloudflare Workers services for routing, personalization, and analytics capture.</div>
-          <div class="work-card__meta">CLOUDFLARE WORKERS &middot; ROUTING &middot; PERSONALIZATION</div>
-        </div>
-      </article>
-    </div>
-  </section>
+	<section class="wrap" id="work" aria-labelledby="work-h">
+		<div class="kicker" id="work-h">SELECTED WORK</div>
+		<div class="work-list">
+			<article class="work-card">
+				<svg width="150" height="90" viewBox="0 0 150 90"><use href="#schAb"></use></svg>
+				<div class="work-card__body">
+					<div class="work-card__title">A/B testing platform</div>
+					<div class="work-card__desc">
+						Server-side experimentation for high-volume storefronts, variant delivery at the edge, zero flicker,
+						checkout untouched.
+					</div>
+					<div class="work-card__meta">EDGE DELIVERY &middot; ZERO FLICKER &middot; MILLIONS OF SESSIONS</div>
+				</div>
+			</article>
+			<article class="work-card">
+				<svg width="150" height="90" viewBox="0 0 150 90"><use href="#schTheme"></use></svg>
+				<div class="work-card__body">
+					<div class="work-card__title">Theme platform</div>
+					<div class="work-card__desc">
+						One Shopify theme architecture powering multiple brands from a single codebase.
+					</div>
+					<div class="work-card__meta">ONE CODEBASE &middot; EVERY BRAND &middot; SHOPIFY / LIQUID</div>
+				</div>
+			</article>
+			<article class="work-card">
+				<svg width="150" height="90" viewBox="0 0 150 90"><use href="#schEdge"></use></svg>
+				<div class="work-card__body">
+					<div class="work-card__title">Edge tooling</div>
+					<div class="work-card__desc">
+						Cloudflare Workers services for routing, personalization, and analytics capture.
+					</div>
+					<div class="work-card__meta">CLOUDFLARE WORKERS &middot; ROUTING &middot; PERSONALIZATION</div>
+				</div>
+			</article>
+		</div>
+	</section>
 </main>
 ```
 
@@ -688,10 +1092,12 @@ git commit -m "Add WHAT I DO and SELECTED WORK sections"
 ## Task 7: OFF THE CLOCK grid and AI aside
 
 **Files:**
+
 - Modify: `public/index.html`
 - Modify: `public/styles.css`
 
 **Interfaces:**
+
 - Consumes: `.wrap`, `.kicker`, `.rule`, token vars; symbols `#icSprout #icMush #icPrinter #icWrench #icKite #icBolt`.
 - Produces: `#off-the-clock` anchor target.
 
@@ -699,19 +1105,66 @@ git commit -m "Add WHAT I DO and SELECTED WORK sections"
 
 ```css
 /* ---- Off the clock ---- */
-.hobby-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.hobby-card { border: 1px dashed var(--l2); border-radius: 8px; padding: 20px 22px;
-  display: flex; flex-direction: column; gap: 10px; transition: border-color .15s ease; }
-.hobby-card svg { width: 22px; height: 22px; color: var(--ac); }
-.hobby-card__title { font: 600 13px/1.3 'IBM Plex Mono', monospace; color: var(--tx); letter-spacing: .1em; }
-.hobby-card__body { font: 400 15px/1.6 'Instrument Sans', sans-serif; color: var(--tx2); }
-@media (max-width: 768px) { .hobby-grid { grid-template-columns: 1fr; } }
+.hobby-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+}
+.hobby-card {
+	border: 1px dashed var(--l2);
+	border-radius: 8px;
+	padding: 20px 22px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	transition: border-color 0.15s ease;
+}
+.hobby-card svg {
+	width: 22px;
+	height: 22px;
+	color: var(--ac);
+}
+.hobby-card__title {
+	font:
+		600 13px/1.3 'IBM Plex Mono',
+		monospace;
+	color: var(--tx);
+	letter-spacing: 0.1em;
+}
+.hobby-card__body {
+	font:
+		400 15px/1.6 'Instrument Sans',
+		sans-serif;
+	color: var(--tx2);
+}
+@media (max-width: 768px) {
+	.hobby-grid {
+		grid-template-columns: 1fr;
+	}
+}
 
 /* ---- AI aside ---- */
-.aside { width: min(760px, 100% - 48px); margin: 96px auto 72px; display: flex; flex-direction: column;
-  align-items: center; gap: 18px; }
-.aside__rule { width: 64px; height: 1px; background: var(--l2); }
-.aside__text { font: italic 400 15px/1.6 'Instrument Sans', sans-serif; color: var(--tx2); max-width: 620px; text-align: center; }
+.aside {
+	width: min(760px, 100% - 48px);
+	margin: 96px auto 72px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 18px;
+}
+.aside__rule {
+	width: 64px;
+	height: 1px;
+	background: var(--l2);
+}
+.aside__text {
+	font:
+		italic 400 15px/1.6 'Instrument Sans',
+		sans-serif;
+	color: var(--tx2);
+	max-width: 620px;
+	text-align: center;
+}
 ```
 
 - [ ] **Step 2: Add markup (copy verbatim from design lines 240-254)**
@@ -758,10 +1211,12 @@ git commit -m "Add OFF THE CLOCK grid and AI aside"
 ## Task 8: Footer / contact
 
 **Files:**
+
 - Modify: `public/index.html` (footer, after `</main>`)
 - Modify: `public/styles.css`
 
 **Interfaces:**
+
 - Consumes: token vars, `#svgB`, `.btn`.
 - Produces: `#contact` anchor target; contact links (mailto, GitHub, LinkedIn, Resume).
 
@@ -769,20 +1224,77 @@ git commit -m "Add OFF THE CLOCK grid and AI aside"
 
 ```css
 /* ---- Footer ---- */
-.footer { position: relative; overflow: hidden; }
-.footer__ridge { position: absolute; left: 0; bottom: 0; width: 100%; height: 240px; }
-.footer__inner { position: relative; z-index: 2; padding: 70px 96px 48px; display: flex; flex-direction: column; gap: 36px; }
-.footer__top { display: flex; align-items: center; justify-content: space-between; }
-.footer__headline { font: 600 34px/1.1 'Instrument Sans', sans-serif; color: var(--tx); letter-spacing: -.01em; }
-.footer__bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 8px; }
-.footer__links { display: flex; gap: 28px; }
-.footer__links a { font: 400 13px/1 'IBM Plex Mono', monospace; color: var(--tx); transition: color .15s ease; }
-.footer__links a:hover { color: var(--ac); }
-.footer__copy { font: 400 11px/1 'IBM Plex Mono', monospace; color: var(--tx); }
+.footer {
+	position: relative;
+	overflow: hidden;
+}
+.footer__ridge {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 240px;
+}
+.footer__inner {
+	position: relative;
+	z-index: 2;
+	padding: 70px 96px 48px;
+	display: flex;
+	flex-direction: column;
+	gap: 36px;
+}
+.footer__top {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.footer__headline {
+	font:
+		600 34px/1.1 'Instrument Sans',
+		sans-serif;
+	color: var(--tx);
+	letter-spacing: -0.01em;
+}
+.footer__bottom {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding-top: 8px;
+}
+.footer__links {
+	display: flex;
+	gap: 28px;
+}
+.footer__links a {
+	font:
+		400 13px/1 'IBM Plex Mono',
+		monospace;
+	color: var(--tx);
+	transition: color 0.15s ease;
+}
+.footer__links a:hover {
+	color: var(--ac);
+}
+.footer__copy {
+	font:
+		400 11px/1 'IBM Plex Mono',
+		monospace;
+	color: var(--tx);
+}
 @media (max-width: 768px) {
-  .footer__inner { padding: 60px 24px 40px; }
-  .footer__top, .footer__bottom { flex-direction: column; align-items: flex-start; gap: 24px; }
-  .footer__links { flex-wrap: wrap; gap: 16px 28px; }
+	.footer__inner {
+		padding: 60px 24px 40px;
+	}
+	.footer__top,
+	.footer__bottom {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 24px;
+	}
+	.footer__links {
+		flex-wrap: wrap;
+		gap: 16px 28px;
+	}
 }
 ```
 
@@ -792,22 +1304,22 @@ The ridge SVG is `#svgB` cropped to its bottom, lifted from design line 257 (`vi
 
 ```html
 <footer class="footer" id="contact">
-  <svg class="footer__ridge" viewBox="0 470 1440 290" preserveAspectRatio="none"><use href="#svgB"></use></svg>
-  <div class="footer__inner">
-    <div class="footer__top">
-      <div class="footer__headline">Sound like your kind of engineer?</div>
-      <a class="btn" href="mailto:mike@robertsmj.com">Hiring? Let's talk</a>
-    </div>
-    <div class="footer__bottom">
-      <div class="footer__links">
-        <a href="mailto:mike@robertsmj.com">mike@robertsmj.com</a>
-        <a href="https://github.com/robertsmikej" target="_blank" rel="noopener">GitHub</a>
-        <a href="#" data-stub="linkedin" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="/resume.pdf" data-stub="resume" target="_blank" rel="noopener">Resume (PDF)</a>
-      </div>
-      <span class="footer__copy">&copy; 2026 MIKE ROBERTS &mdash; TREASURE VALLEY, IDAHO</span>
-    </div>
-  </div>
+	<svg class="footer__ridge" viewBox="0 470 1440 290" preserveAspectRatio="none"><use href="#svgB"></use></svg>
+	<div class="footer__inner">
+		<div class="footer__top">
+			<div class="footer__headline">Sound like your kind of engineer?</div>
+			<a class="btn" href="mailto:mike@robertsmj.com">Hiring? Let's talk</a>
+		</div>
+		<div class="footer__bottom">
+			<div class="footer__links">
+				<a href="mailto:mike@robertsmj.com">mike@robertsmj.com</a>
+				<a href="https://github.com/robertsmikej" target="_blank" rel="noopener">GitHub</a>
+				<a href="#" data-stub="linkedin" target="_blank" rel="noopener">LinkedIn</a>
+				<a href="/resume.pdf" data-stub="resume" target="_blank" rel="noopener">Resume (PDF)</a>
+			</div>
+			<span class="footer__copy">&copy; 2026 MIKE ROBERTS &mdash; TREASURE VALLEY, IDAHO</span>
+		</div>
+	</div>
 </footer>
 ```
 
@@ -829,10 +1341,12 @@ git commit -m "Add footer/contact with ridge terrain and contact links"
 ## Task 9: Reduced motion, responsive polish, accessibility pass
 
 **Files:**
+
 - Modify: `public/styles.css`
 - Modify: `public/index.html` (aria/semantics touch-ups only)
 
 **Interfaces:**
+
 - Consumes: everything prior.
 - Produces: a reduced-motion-safe, mobile-correct, accessible page.
 
@@ -840,10 +1354,21 @@ git commit -m "Add footer/contact with ridge terrain and contact links"
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; }
-  .hero__terrain use { clip-path: none !important; }
-  .hero__ridge path { stroke-dashoffset: 0 !important; opacity: 0 !important; }
-  html { scroll-behavior: auto; }
+	*,
+	*::before,
+	*::after {
+		animation: none !important;
+	}
+	.hero__terrain use {
+		clip-path: none !important;
+	}
+	.hero__ridge path {
+		stroke-dashoffset: 0 !important;
+		opacity: 0 !important;
+	}
+	html {
+		scroll-behavior: auto;
+	}
 }
 ```
 
@@ -876,11 +1401,13 @@ git commit -m "Add reduced-motion support, responsive polish, accessibility pass
 ## Task 10: Head, SEO, favicon, and optional OG image
 
 **Files:**
+
 - Modify: `public/index.html` (head)
 - Create: `public/favicon.svg`
 - Create (optional): `public/og.png`
 
 **Interfaces:**
+
 - Produces: complete document head; browser-tab favicon.
 
 - [ ] **Step 1: Create `public/favicon.svg` (mint ridgeline on the dark bg)**
@@ -897,17 +1424,19 @@ git commit -m "Add reduced-motion support, responsive polish, accessibility pass
 Add/confirm inside `<head>` (title/description authored without em dashes; keep the no-flash script first, preloads and stylesheet as already present):
 
 ```html
-  <meta name="description" content="Mike Roberts, senior full-stack engineer in Idaho. A/B testing infrastructure and theme platforms for high-volume Shopify storefronts.">
-  <meta name="theme-color" content="#0A1414" media="(prefers-color-scheme: dark)">
-  <meta name="theme-color" content="#F7F6EF" media="(prefers-color-scheme: light)">
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="canonical" href="https://robertsmj.com/">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Mike Roberts, senior full-stack engineer">
-  <meta property="og:description" content="Idaho roots, production systems, and dirt under the fingernails.">
-  <meta property="og:url" content="https://robertsmj.com/">
-  <meta property="og:image" content="https://robertsmj.com/og.png">
-  <meta name="twitter:card" content="summary_large_image">
+<meta
+	name="description"
+	content="Mike Roberts, senior full-stack engineer in Idaho. A/B testing infrastructure and theme platforms for high-volume Shopify storefronts." />
+<meta name="theme-color" content="#0A1414" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#F7F6EF" media="(prefers-color-scheme: light)" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="canonical" href="https://robertsmj.com/" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Mike Roberts, senior full-stack engineer" />
+<meta property="og:description" content="Idaho roots, production systems, and dirt under the fingernails." />
+<meta property="og:url" content="https://robertsmj.com/" />
+<meta property="og:image" content="https://robertsmj.com/og.png" />
+<meta name="twitter:card" content="summary_large_image" />
 ```
 
 - [ ] **Step 3 (optional): Generate `public/og.png` (1200x630)**
@@ -932,6 +1461,7 @@ git commit -m "Add favicon, SEO meta, Open Graph tags and OG image"
 **Files:** none (verification + deploy)
 
 **Interfaces:**
+
 - Produces: a live `*.workers.dev` preview URL, zero DNS risk.
 
 - [ ] **Step 1: Run the unit tests**
@@ -963,6 +1493,7 @@ Expected: identical behavior to local.
 - [ ] **Step 6: Commit any deploy-config tweaks and update the repo README**
 
 Create a short top-level `README.md` (dev/deploy/test commands, stack, deploy notes) if not already present, then:
+
 ```bash
 git add -A
 git commit -m "Deploy to workers.dev preview; add project README"

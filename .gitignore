@@ -6,5 +6,8 @@ npm-debug.log*
 .wrangler/
 .dev.vars
 
+# Test output
+coverage/
+
 # OS
 .DS_Store
