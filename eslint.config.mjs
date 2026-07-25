@@ -67,4 +67,13 @@ export default [
 			'max-lines-per-function': 'off',
 		},
 	},
+	{
+		// main.test.js runs under @vitest-environment jsdom because main.js is the page
+		// entry point and reads the ambient `document`. Every other test builds its own
+		// JSDOM and stays in the node environment.
+		files: ['test/main.test.js'],
+		languageOptions: {
+			globals: { ...globals.node, ...globals.browser },
+		},
+	},
 ];

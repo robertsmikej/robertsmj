@@ -1,68 +1,22 @@
-import { nextTheme, THEMES, STORAGE_KEY } from './theme.js';
+/**
+ * Page entry point. Deliberately holds no logic of its own: it only wires the
+ * behavior modules to this document, so everything with logic in it stays
+ * testable without a browser.
+ *
+ * Hero sizing used to live here, recomputing `--hero-scale` and `--hero-h` on every
+ * resize event. It is now pure CSS (`calc(100vw / 1440px)` in styles.css), which
+ * produces identical values, drops an unthrottled resize handler, and makes the
+ * hero render correctly with JavaScript disabled.
+ */
 
-const root = document.documentElement;
-
-/* ---- Theme toggle ---- */
-function currentTheme() {
-  return root.getAttribute('data-theme') === THEMES.LIGHT ? THEMES.LIGHT : THEMES.DARK;
-}
-
-const THEME_COLORS = { [THEMES.DARK]: '#0C1116', [THEMES.LIGHT]: '#F4F6F8' };
-
-function syncTogglePressed(theme) {
-  const btn = document.querySelector('[data-theme-toggle]');
-  if (btn) {
-    btn.setAttribute('aria-pressed', String(theme === THEMES.DARK));
-  }
-  const meta = document.getElementById('theme-color-meta');
-  if (meta) {
-    meta.setAttribute('content', THEME_COLORS[theme]);
-  }
-}
-
-function initThemeToggle() {
-  const btn = document.querySelector('[data-theme-toggle]');
-  if (!btn) return;
-  syncTogglePressed(currentTheme());
-  btn.addEventListener('click', () => {
-    const next = nextTheme(currentTheme());
-    try { localStorage.setItem(STORAGE_KEY, next); } catch (e) {}
-    root.setAttribute('data-theme', next);
-    syncTogglePressed(next);
-  });
-}
-
-/* ---- Hero canvas scaling ----
-   The hero is a fixed design canvas (1440x760 desktop, 390x760 mobile) so the
-   pixel-positioned animation overlays stay aligned. Scale it to viewport width.
-   On desktop the hero height tracks the scaled canvas; on mobile the height is
-   CSS-driven (100svh) with the terrain bottom-anchored, so we skip --hero-h. */
-const DESKTOP_W = 1440;
-const MOBILE_W = 390;
-const DESIGN_H = 760;
-const mobileQuery = matchMedia('(max-width: 768px)');
-
-function setHeroScale() {
-  const isMobile = mobileQuery.matches;
-  const designW = isMobile ? MOBILE_W : DESKTOP_W;
-  const scale = window.innerWidth / designW;
-  root.style.setProperty('--hero-scale', String(scale));
-  if (isMobile) {
-    root.style.removeProperty('--hero-h');
-  } else {
-    root.style.setProperty('--hero-h', `${DESIGN_H * scale}px`);
-  }
-}
+import { initThemeToggle } from './theme-toggle.js';
 
 function init() {
-  initThemeToggle();
-  setHeroScale();
-  window.addEventListener('resize', setHeroScale);
-  mobileQuery.addEventListener('change', setHeroScale);
+	initThemeToggle(document);
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
+	document.addEventListener('DOMContentLoaded', init);
 } else {
-  init();
+	init();
 }

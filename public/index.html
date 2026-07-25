@@ -1,37 +1,58 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <script>
-    /* No-flash theme init. Mirrors resolveTheme() in theme.js. */
-    (function () {
-      try {
-        var s = localStorage.getItem('theme');
-        var t = (s === 'dark' || s === 'light') ? s : 'dark';
-        document.documentElement.setAttribute('data-theme', t);
-      } catch (e) {}
-    })();
-  </script>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mike Roberts, senior full-stack engineer</title>
-  <meta name="description" content="Mike Roberts, senior full-stack engineer in Idaho. A/B testing infrastructure and theme platforms for high-volume Shopify storefronts.">
-  <meta name="theme-color" content="#0C1116" id="theme-color-meta">
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="canonical" href="https://robertsmj.com/">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Mike Roberts, senior full-stack engineer">
-  <meta property="og:description" content="I make production systems boring on purpose, and my hobbies complicated for no reason.">
-  <meta property="og:url" content="https://robertsmj.com/">
-  <meta property="og:image" content="https://robertsmj.com/og.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <link rel="preload" href="/fonts/space-grotesk-v22-latin-600.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/fonts/instrument-sans-v4-latin-600.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/fonts/instrument-sans-v4-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
-  <!-- SVG symbol library (verbatim from design handoff) -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+	<head>
+		<script>
+			/* Sets data-theme before first paint so the page never flashes the wrong theme.
+			   This duplicates resolveTheme() in theme.js deliberately: an ES module import
+			   would be deferred and the flash would happen anyway. It is the one piece of
+			   render-blocking script on the page, and test/no-flash-script.test.js executes
+			   this exact snippet against resolveTheme() so the two cannot drift apart.
+			   Editing this block changes its CSP hash in public/_headers; csp.test.js checks it. */
+			(function () {
+				try {
+					var stored = localStorage.getItem('theme');
+					var theme = stored === 'dark' || stored === 'light' ? stored : 'dark';
+					document.documentElement.setAttribute('data-theme', theme);
+				} catch {
+					/* Storage blocked (Safari private mode). The dark tokens on :root in
+					   styles.css are already the default, so there is nothing to fall back to. */
+				}
+			})();
+		</script>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Mike Roberts, senior full-stack engineer</title>
+		<meta
+			name="description"
+			content="Mike Roberts, senior full-stack engineer in Idaho. A/B testing infrastructure and theme platforms for high-volume Shopify storefronts." />
+		<meta name="theme-color" content="#0C1116" id="theme-color-meta" />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="canonical" href="https://robertsmj.com/" />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="Mike Roberts, senior full-stack engineer" />
+		<meta
+			property="og:description"
+			content="I make production systems boring on purpose, and my hobbies complicated for no reason." />
+		<meta property="og:url" content="https://robertsmj.com/" />
+		<meta property="og:image" content="https://robertsmj.com/og.png" />
+		<meta property="og:image:alt" content="Wireframe topographic mountain ridgeline with the name Mike Roberts" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<link rel="preload" href="/fonts/space-grotesk-v22-latin-600.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href="/fonts/instrument-sans-v4-latin-600.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href="/fonts/instrument-sans-v4-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="stylesheet" href="/styles.css" />
+	</head>
+	<body>
+		<a class="skip-link" href="#main">Skip to content</a>
+
+		<!-- SVG symbol library (verbatim from design handoff).
+       prettier-ignore keeps the formatter from reflowing the artwork: whitespace
+       inside SVG <text> is significant, and this block is meant to stay
+       byte-comparable against the original handoff. -->
+		<!-- prettier-ignore -->
+		<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
   <symbol id="svgB" viewBox="0 0 1440 760">
   <g fill="none" style="stroke:var(--l1)" stroke-width="1">
@@ -89,152 +110,252 @@
   </defs>
   </svg>
 
-  <header class="hero">
-    <!-- DESKTOP stage: terrain + ridge draw + overlay spans -->
-    <div class="hero__stage hero__stage--desktop">
-      <svg class="hero__terrain" width="1440" height="760" aria-hidden="true" focusable="false"><use href="#svgB"></use></svg>
-      <svg class="hero__ridge" width="1440" height="760" aria-hidden="true" focusable="false"><path pathLength="1" d="M0,610 L140,520 L300,600 L430,470 L560,588 L700,430 L840,580 L980,455 L1120,592 L1260,495 L1440,596"></path></svg>
-      <span style="position:absolute;top:0;bottom:0;left:0;width:2px;background:var(--ac);opacity:0;animation:scan 1.6s cubic-bezier(.4,0,.2,1) .1s forwards"></span>
-      <span style="position:absolute;left:545px;top:716px;width:70px;height:1px;background:var(--ac);opacity:0;animation:glint 6s ease-in-out 3s infinite"></span>
-      <span style="position:absolute;left:456px;top:690px;width:4px;height:4px;border-radius:50%;background:var(--wm);opacity:0;animation:glint 2.4s ease-in-out 2.6s infinite"></span>
-      <span style="position:absolute;left:455px;top:682px;width:5px;height:5px;border-radius:50%;border:1px solid var(--tx2);opacity:0;animation:smoke 5s linear 2.8s infinite"></span>
-      <span style="position:absolute;left:457px;top:682px;width:4px;height:4px;border-radius:50%;border:1px solid var(--tx2);opacity:0;animation:smoke 5s linear 4.5s infinite"></span>
-      <span style="position:absolute;left:454px;top:682px;width:3px;height:3px;border-radius:50%;border:1px solid var(--tx2);opacity:0;animation:smoke 5s linear 6.2s infinite"></span>
-      <span style="position:absolute;left:1035px;top:712px;width:70px;height:1px;background:var(--ac);opacity:0;animation:glint 6s ease-in-out 5.5s infinite"></span>
-      <span style="position:absolute;width:8px;height:8px;border-radius:50%;background:var(--wm);opacity:0;offset-path:path('M0,610 L140,520 L300,600 L430,470 L560,588 L700,430 L840,580 L980,455 L1120,592 L1260,495 L1440,596');animation:travel 10s linear 1.8s infinite"></span>
-      <span style="position:absolute;left:695px;top:425px;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--ac);opacity:0;animation:pulse 3.4s ease-out 2.2s infinite"></span>
-      <span style="position:absolute;left:425px;top:465px;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--ac);opacity:0;animation:pulse 3.4s ease-out 3.4s infinite"></span>
-      <span style="position:absolute;left:1255px;top:490px;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--ac);opacity:0;animation:pulse 3.4s ease-out 4.6s infinite"></span>
-    </div>
-    <!-- MOBILE stage -->
-    <div class="hero__stage hero__stage--mobile">
-      <svg class="hero__terrain" width="390" height="760" aria-hidden="true" focusable="false"><use href="#svgBm"></use></svg>
-      <svg class="hero__ridge" width="390" height="760" aria-hidden="true" focusable="false"><path pathLength="1" d="M0,640 L70,580 L140,632 L200,550 L260,624 L330,570 L390,634"></path></svg>
-      <span style="position:absolute;top:0;bottom:0;left:0;width:2px;background:var(--ac);opacity:0;animation:scanM 1.6s cubic-bezier(.4,0,.2,1) .1s forwards"></span>
-      <span style="position:absolute;left:235px;top:730px;width:60px;height:1px;background:var(--ac);opacity:0;animation:glint 6s ease-in-out 3s infinite"></span>
-      <span style="position:absolute;width:7px;height:7px;border-radius:50%;background:var(--wm);opacity:0;offset-path:path('M0,640 L70,580 L140,632 L200,550 L260,624 L330,570 L390,634');animation:travel 8s linear 1.8s infinite"></span>
-      <span style="position:absolute;left:195px;top:545px;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--ac);opacity:0;animation:pulse 3.4s ease-out 2.2s infinite"></span>
-      <span style="position:absolute;left:325px;top:565px;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--ac);opacity:0;animation:pulse 3.4s ease-out 3.6s infinite"></span>
-    </div>
+		<header class="hero">
+			<!-- DESKTOP stage: terrain + ridge draw + overlay spans -->
+			<div class="hero__stage hero__stage--desktop">
+				<svg class="hero__terrain" width="1440" height="760" aria-hidden="true" focusable="false">
+					<use href="#svgB"></use>
+				</svg>
+				<svg class="hero__ridge" width="1440" height="760" aria-hidden="true" focusable="false">
+					<path
+						pathLength="1"
+						d="M0,610 L140,520 L300,600 L430,470 L560,588 L700,430 L840,580 L980,455 L1120,592 L1260,495 L1440,596"></path>
+				</svg>
+				<span class="hero-fx hero-fx--scan"></span>
+				<span class="hero-fx hero-fx--glint hero-fx--glint-lake-west"></span>
+				<span class="hero-fx hero-fx--ember"></span>
+				<span class="hero-fx hero-fx--smoke hero-fx--smoke-1"></span>
+				<span class="hero-fx hero-fx--smoke hero-fx--smoke-2"></span>
+				<span class="hero-fx hero-fx--smoke hero-fx--smoke-3"></span>
+				<span class="hero-fx hero-fx--glint hero-fx--glint-lake-east"></span>
+				<span class="hero-fx hero-fx--ridge-dot hero-fx--ridge-dot-desktop"></span>
+				<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-center"></span>
+				<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-west"></span>
+				<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-east"></span>
+			</div>
+			<!-- MOBILE stage -->
+			<div class="hero__stage hero__stage--mobile">
+				<svg class="hero__terrain" width="390" height="760" aria-hidden="true" focusable="false">
+					<use href="#svgBm"></use>
+				</svg>
+				<svg class="hero__ridge" width="390" height="760" aria-hidden="true" focusable="false">
+					<path pathLength="1" d="M0,640 L70,580 L140,632 L200,550 L260,624 L330,570 L390,634"></path>
+				</svg>
+				<span class="hero-fx hero-fx--scan-mobile"></span>
+				<span class="hero-fx hero-fx--glint hero-fx--glint-lake-mobile"></span>
+				<span class="hero-fx hero-fx--ridge-dot hero-fx--ridge-dot-mobile"></span>
+				<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-mobile-west"></span>
+				<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-mobile-east"></span>
+			</div>
 
-    <!-- Shared top bar (single copy, responsive via CSS) -->
-    <div class="topbar">
-      <span class="wordmark">robertsmj.com</span>
-      <nav class="nav">
-        <a href="#work">The work</a>
-        <a href="#off-the-clock">Off the clock</a>
-        <a href="#contact">Contact</a>
-        <button class="toggle" data-theme-toggle type="button" aria-label="Toggle color theme" aria-pressed="true"><span class="toggle__knob"></span></button>
-      </nav>
-    </div>
+			<!-- Shared top bar (single copy, responsive via CSS) -->
+			<div class="topbar">
+				<span class="wordmark">robertsmj.com</span>
+				<nav class="nav">
+					<a href="#work">The work</a>
+					<a href="#off-the-clock">Off the clock</a>
+					<a href="#contact">Contact</a>
+					<button class="toggle" data-theme-toggle type="button" aria-label="Toggle color theme" aria-pressed="true">
+						<span class="toggle__knob"></span>
+					</button>
+				</nav>
+			</div>
 
-    <!-- Shared hero content (single copy, responsive via CSS) -->
-    <div class="hero__content">
-      <h1 class="hero__name">Mike Roberts</h1>
-      <div class="hero__sub">Senior full-stack engineer. I make production systems boring on purpose, and my hobbies complicated for no reason.</div>
-      <div class="hero__cta">
-        <a class="btn" href="mailto:mike@robertsmj.com">Hiring? Let's talk</a>
-        <a class="textlink" href="#work">The work &darr;</a>
-      </div>
-    </div>
-  </header>
+			<!-- Shared hero content (single copy, responsive via CSS) -->
+			<div class="hero__content">
+				<h1 class="hero__name">Mike Roberts</h1>
+				<p class="hero__sub">
+					Senior full-stack engineer. I make production systems boring on purpose, and my hobbies complicated for no
+					reason.
+				</p>
+				<div class="hero__cta">
+					<a class="btn" href="mailto:mike@robertsmj.com">Hiring? Let's talk</a>
+					<a class="textlink" href="#work">The work &darr;</a>
+				</div>
+			</div>
+		</header>
 
-  <main class="content">
-    <section class="wrap" aria-labelledby="whatido">
-      <h2 class="kicker" id="whatido">WHAT I DO</h2>
-      <p class="prose">I help build A/B testing infrastructure, custom apps, and theme platforms for high-volume Shopify storefronts. The job is shipping experiments to millions of sessions without breaking checkout, and building the React and Admin API apps that fill the gaps native Shopify leaves. I care about systems that stay fast, measurable, and boring to operate. Thirteen years across the stack, nearly all of it in high-traffic e-commerce.</p>
-      <div class="stack">
-        <span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icTs"></use></svg>TYPESCRIPT</span>
-        <span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icShop"></use></svg>SHOPIFY / LIQUID</span>
-        <span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icCloud"></use></svg>CLOUDFLARE WORKERS</span>
-        <span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icReact"></use></svg>REACT</span>
-        <span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icRemix"></use></svg>REMIX</span>
-        <span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icGql"></use></svg>GRAPHQL</span>
-        <span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icNode"></use></svg>NODE</span>
-        <span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icClaude"></use></svg>CLAUDE</span>
-      </div>
-    </section>
+		<main class="content" id="main" tabindex="-1">
+			<section class="wrap" aria-labelledby="whatido">
+				<h2 class="kicker" id="whatido">WHAT I DO</h2>
+				<p class="prose">
+					I help build A/B testing infrastructure, custom apps, and theme platforms for high-volume Shopify storefronts.
+					The job is shipping experiments to millions of sessions without breaking checkout, and building the React and
+					Admin API apps that fill the gaps native Shopify leaves. I care about systems that stay fast, measurable, and
+					boring to operate. Thirteen years across the stack, nearly all of it in high-traffic e-commerce.
+				</p>
+				<div class="stack">
+					<span
+						><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icTs"></use></svg
+						>TYPESCRIPT</span
+					>
+					<span
+						><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icShop"></use></svg>SHOPIFY /
+						LIQUID</span
+					>
+					<span
+						><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icCloud"></use></svg>CLOUDFLARE
+						WORKERS</span
+					>
+					<span
+						><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icReact"></use></svg>REACT</span
+					>
+					<span
+						><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icRemix"></use></svg>REMIX</span
+					>
+					<span
+						><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icGql"></use></svg>GRAPHQL</span
+					>
+					<span
+						><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icNode"></use></svg>NODE</span
+					>
+					<span
+						><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icClaude"></use></svg
+						>CLAUDE</span
+					>
+				</div>
+			</section>
 
-    <hr class="rule">
+			<hr class="rule" />
 
-    <section class="wrap" id="work" aria-labelledby="work-h">
-      <h2 class="kicker" id="work-h">SELECTED WORK</h2>
-      <div class="work-list">
-        <article class="work-card">
-          <svg width="150" height="90" viewBox="0 0 150 90" aria-hidden="true" focusable="false"><use href="#schAb"></use></svg>
-          <div class="work-card__body">
-            <div class="work-card__title">A/B testing platform</div>
-            <div class="work-card__desc">Server-side experimentation for high-volume storefronts, variant delivery at the edge, zero flicker, checkout untouched.</div>
-            <div class="work-card__meta">400+ EXPERIMENTS SHIPPED &middot; MILLIONS OF SESSIONS &middot; ZERO FLICKER</div>
-          </div>
-        </article>
-        <article class="work-card">
-          <svg width="150" height="90" viewBox="0 0 150 90" aria-hidden="true" focusable="false"><use href="#schTheme"></use></svg>
-          <div class="work-card__body">
-            <div class="work-card__title">Theme platform</div>
-            <div class="work-card__desc">One Shopify theme architecture powering multiple brands from a single codebase.</div>
-            <div class="work-card__meta">ONE CODEBASE &middot; EVERY BRAND &middot; SHOPIFY / LIQUID</div>
-          </div>
-        </article>
-        <article class="work-card">
-          <svg width="150" height="90" viewBox="0 0 150 90" aria-hidden="true" focusable="false"><use href="#schEdge"></use></svg>
-          <div class="work-card__body">
-            <div class="work-card__title">Edge tooling</div>
-            <div class="work-card__desc">Cloudflare Workers services for routing, personalization, and analytics capture.</div>
-            <div class="work-card__meta">CLOUDFLARE WORKERS &middot; ROUTING &middot; PERSONALIZATION</div>
-          </div>
-        </article>
-        <article class="work-card">
-          <svg width="150" height="90" viewBox="0 0 150 90" aria-hidden="true" focusable="false"><use href="#schMsg"></use></svg>
-          <div class="work-card__body">
-            <div class="work-card__title">Customer messaging platform</div>
-            <div class="work-card__desc">A real-time messaging app that replaced Facebook groups for a supplement brand's community, built with React, Redux, and Apollo GraphQL subscriptions.</div>
-            <div class="work-card__meta">89,000 USERS &middot; REAL-TIME &middot; REACT / GRAPHQL</div>
-          </div>
-        </article>
-      </div>
-    </section>
+			<section class="wrap" id="work" aria-labelledby="work-h">
+				<h2 class="kicker" id="work-h">SELECTED WORK</h2>
+				<div class="work-list">
+					<article class="work-card">
+						<svg width="150" height="90" viewBox="0 0 150 90" aria-hidden="true" focusable="false">
+							<use href="#schAb"></use>
+						</svg>
+						<div class="work-card__body">
+							<h3 class="work-card__title">A/B testing platform</h3>
+							<p class="work-card__desc">
+								Server-side experimentation for high-volume storefronts, variant delivery at the edge, zero flicker,
+								checkout untouched.
+							</p>
+							<div class="work-card__meta">
+								400+ EXPERIMENTS SHIPPED &middot; MILLIONS OF SESSIONS &middot; ZERO FLICKER
+							</div>
+						</div>
+					</article>
+					<article class="work-card">
+						<svg width="150" height="90" viewBox="0 0 150 90" aria-hidden="true" focusable="false">
+							<use href="#schTheme"></use>
+						</svg>
+						<div class="work-card__body">
+							<h3 class="work-card__title">Theme platform</h3>
+							<p class="work-card__desc">
+								One Shopify theme architecture powering multiple brands from a single codebase.
+							</p>
+							<div class="work-card__meta">ONE CODEBASE &middot; EVERY BRAND &middot; SHOPIFY / LIQUID</div>
+						</div>
+					</article>
+					<article class="work-card">
+						<svg width="150" height="90" viewBox="0 0 150 90" aria-hidden="true" focusable="false">
+							<use href="#schEdge"></use>
+						</svg>
+						<div class="work-card__body">
+							<h3 class="work-card__title">Edge tooling</h3>
+							<p class="work-card__desc">
+								Cloudflare Workers services for routing, personalization, and analytics capture.
+							</p>
+							<div class="work-card__meta">CLOUDFLARE WORKERS &middot; ROUTING &middot; PERSONALIZATION</div>
+						</div>
+					</article>
+					<article class="work-card">
+						<svg width="150" height="90" viewBox="0 0 150 90" aria-hidden="true" focusable="false">
+							<use href="#schMsg"></use>
+						</svg>
+						<div class="work-card__body">
+							<h3 class="work-card__title">Customer messaging platform</h3>
+							<p class="work-card__desc">
+								A real-time messaging app that replaced Facebook groups for a supplement brand's community, built with
+								React, Redux, and Apollo GraphQL subscriptions.
+							</p>
+							<div class="work-card__meta">89,000 USERS &middot; REAL-TIME &middot; REACT / GRAPHQL</div>
+						</div>
+					</article>
+				</div>
+			</section>
 
-    <hr class="rule">
+			<hr class="rule" />
 
-    <section class="wrap" id="off-the-clock" aria-labelledby="otc-h">
-      <h2 class="kicker" id="otc-h">OFF THE CLOCK</h2>
-      <div class="hobby-grid">
-        <article class="hobby-card"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icSprout"></use></svg><div class="hobby-card__title">DIRT OPS</div><div class="hobby-card__body">Twelve raised beds and a food-security spreadsheet that is, frankly, a little intense.</div></article>
-        <article class="hobby-card"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icMush"></use></svg><div class="hobby-card__title">THE FUNGUS PIPELINE</div><div class="hobby-card__body">Oak logs drilled, plugged, and waxed by hand. Deploy cycle: two years.</div></article>
-        <article class="hobby-card"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icPrinter"></use></svg><div class="hobby-card__title">PRINT FARM</div><div class="hobby-card__body">Two printers running. The replacement part was modeled before the original broke.</div></article>
-        <article class="hobby-card"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icWrench"></use></svg><div class="hobby-card__title">GERMAN CAR THERAPY</div><div class="hobby-card__body">Diagnosed a BMW water pump for fun. The fun part is being right.</div></article>
-        <article class="hobby-card"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icKite"></use></svg><div class="hobby-card__title">DAD MODE</div><div class="hobby-card__body">Raising kids who know where food comes from and how to find a stud without an app.</div></article>
-        <article class="hobby-card"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icBolt"></use></svg><div class="hobby-card__title">WHATEVER BREAKS NEXT</div><div class="hobby-card__body">There is always something. That is kind of the appeal.</div></article>
-      </div>
-    </section>
+			<section class="wrap" id="off-the-clock" aria-labelledby="otc-h">
+				<h2 class="kicker" id="otc-h">OFF THE CLOCK</h2>
+				<div class="hobby-grid">
+					<article class="hobby-card">
+						<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icSprout"></use></svg>
+						<h3 class="hobby-card__title">DIRT OPS</h3>
+						<p class="hobby-card__body">
+							Twelve raised beds and a food-security spreadsheet that is, frankly, a little intense.
+						</p>
+					</article>
+					<article class="hobby-card">
+						<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icMush"></use></svg>
+						<h3 class="hobby-card__title">THE FUNGUS PIPELINE</h3>
+						<p class="hobby-card__body">Oak logs drilled, plugged, and waxed by hand. Deploy cycle: two years.</p>
+					</article>
+					<article class="hobby-card">
+						<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icPrinter"></use></svg>
+						<h3 class="hobby-card__title">PRINT FARM</h3>
+						<p class="hobby-card__body">
+							Two printers running. The replacement part was modeled before the original broke.
+						</p>
+					</article>
+					<article class="hobby-card">
+						<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icWrench"></use></svg>
+						<h3 class="hobby-card__title">GERMAN CAR THERAPY</h3>
+						<p class="hobby-card__body">Diagnosed a BMW water pump for fun. The fun part is being right.</p>
+					</article>
+					<article class="hobby-card">
+						<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icKite"></use></svg>
+						<h3 class="hobby-card__title">DAD MODE</h3>
+						<p class="hobby-card__body">
+							Raising kids who know where food comes from and how to find a stud without an app.
+						</p>
+					</article>
+					<article class="hobby-card">
+						<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icBolt"></use></svg>
+						<h3 class="hobby-card__title">WHATEVER BREAKS NEXT</h3>
+						<p class="hobby-card__body">There is always something. That is kind of the appeal.</p>
+					</article>
+				</div>
+			</section>
 
-    <aside class="aside">
-      <span class="aside__rule"></span>
-      <div class="aside__text">Yes, an engineer used AI to build his own website. I ship with the best tools available, that's kind of the point.</div>
-    </aside>
-  </main>
+			<aside class="aside">
+				<span class="aside__rule"></span>
+				<p class="aside__text">
+					Yes, an engineer used AI to build his own website. I ship with the best tools available, that's kind of the
+					point.
+				</p>
+			</aside>
+		</main>
 
-  <footer class="footer" id="contact">
-    <svg class="footer__ridge" viewBox="0 470 1440 290" preserveAspectRatio="none" aria-hidden="true" focusable="false"><use href="#svgB"></use></svg>
-    <div class="footer__inner">
-      <div class="footer__top">
-        <h2 class="footer__headline">Sound like your kind of engineer?</h2>
-        <a class="btn" href="mailto:mike@robertsmj.com">Hiring? Let's talk</a>
-      </div>
-      <div class="footer__bottom">
-        <!-- LinkedIn and Resume are stubs; update with real URL/PDF before the domain goes live. -->
-        <div class="footer__links">
-          <a href="mailto:mike@robertsmj.com">mike@robertsmj.com</a>
-          <a href="https://github.com/robertsmikej" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://www.linkedin.com/in/robertsmichaelj/" target="_blank" rel="noopener">LinkedIn</a>
-          <a href="/resume.pdf" data-stub="resume">Resume (PDF)</a>
-        </div>
-        <span class="footer__copy">&copy; 2026 MIKE ROBERTS, TREASURE VALLEY, IDAHO</span>
-      </div>
-    </div>
-  </footer>
+		<footer class="footer" id="contact">
+			<svg
+				class="footer__ridge"
+				viewBox="0 470 1440 290"
+				preserveAspectRatio="none"
+				aria-hidden="true"
+				focusable="false">
+				<use href="#svgB"></use>
+			</svg>
+			<div class="footer__inner">
+				<div class="footer__top">
+					<h2 class="footer__headline">Sound like your kind of engineer?</h2>
+					<a class="btn" href="mailto:mike@robertsmj.com">Hiring? Let's talk</a>
+				</div>
+				<div class="footer__bottom">
+					<!-- LinkedIn and Resume are stubs; update with real URL/PDF before the domain goes live. -->
+					<div class="footer__links">
+						<a href="mailto:mike@robertsmj.com">mike@robertsmj.com</a>
+						<a href="https://github.com/robertsmikej" target="_blank" rel="noopener">GitHub</a>
+						<a href="https://www.linkedin.com/in/robertsmichaelj/" target="_blank" rel="noopener">LinkedIn</a>
+						<a href="/resume.pdf" data-stub="resume">Resume (PDF)</a>
+					</div>
+					<span class="footer__copy">&copy; 2026 MIKE ROBERTS, TREASURE VALLEY, IDAHO</span>
+				</div>
+			</div>
+		</footer>
 
-  <script type="module" src="/main.js"></script>
-</body>
+		<script type="module" src="/main.js"></script>
+	</body>
 </html>
