@@ -5,5 +5,8 @@
 	"compatibility_date": "2025-11-01",
 	"assets": {
 		"directory": "./public",
+		// Without this, a request for any path that is not an asset returns a bare 404
+		// with an empty body. Serves public/404.html instead.
+		"not_found_handling": "404-page",
 	},
 }

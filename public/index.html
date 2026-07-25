@@ -1,24 +1,6 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<script>
-			/* Sets data-theme before first paint so the page never flashes the wrong theme.
-			   This duplicates resolveTheme() in theme.js deliberately: an ES module import
-			   would be deferred and the flash would happen anyway. It is the one piece of
-			   render-blocking script on the page, and test/no-flash-script.test.js executes
-			   this exact snippet against resolveTheme() so the two cannot drift apart.
-			   Editing this block changes its CSP hash in public/_headers; csp.test.js checks it. */
-			(function () {
-				try {
-					var stored = localStorage.getItem('theme');
-					var theme = stored === 'dark' || stored === 'light' ? stored : 'dark';
-					document.documentElement.setAttribute('data-theme', theme);
-				} catch {
-					/* Storage blocked (Safari private mode). The dark tokens on :root in
-					   styles.css are already the default, so there is nothing to fall back to. */
-				}
-			})();
-		</script>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Mike Roberts, senior full-stack engineer</title>
@@ -26,6 +8,33 @@
 			name="description"
 			content="Mike Roberts, senior full-stack engineer in Idaho. A/B testing infrastructure and theme platforms for high-volume Shopify storefronts." />
 		<meta name="theme-color" content="#0C1116" id="theme-color-meta" />
+		<script>
+			/* Sets data-theme before first paint so the page never flashes the wrong theme.
+			   This duplicates resolveTheme() in theme.js deliberately: an ES module import
+			   would be deferred and the flash would happen anyway. It is the one piece of
+			   render-blocking script on the page, and test/no-flash-script.test.js executes
+			   this exact snippet against resolveTheme() so the two cannot drift apart.
+
+			   It sits after the theme-color meta tag, and before the stylesheet, because it
+			   updates that tag too: a returning light-theme visitor used to get dark mobile
+			   browser chrome until the deferred module ran, then watched it switch.
+
+			   Editing this block changes its CSP hash in public/_headers; csp.test.js checks it. */
+			(function () {
+				try {
+					var stored = localStorage.getItem('theme');
+					var theme = stored === 'dark' || stored === 'light' ? stored : 'dark';
+					document.documentElement.setAttribute('data-theme', theme);
+					var meta = document.getElementById('theme-color-meta');
+					if (meta) {
+						meta.setAttribute('content', theme === 'dark' ? '#0C1116' : '#F4F6F8');
+					}
+				} catch {
+					/* Storage blocked (Safari private mode). The dark tokens on :root in
+					   styles.css are already the default, so there is nothing to fall back to. */
+				}
+			})();
+		</script>
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 		<link rel="canonical" href="https://robertsmj.com/" />
 		<meta property="og:type" content="website" />
@@ -111,41 +120,45 @@
   </svg>
 
 		<header class="hero">
-			<!-- DESKTOP stage: terrain + ridge draw + overlay spans -->
-			<div class="hero__stage hero__stage--desktop">
-				<svg class="hero__terrain" width="1440" height="760" aria-hidden="true" focusable="false">
-					<use href="#svgB"></use>
-				</svg>
-				<svg class="hero__ridge" width="1440" height="760" aria-hidden="true" focusable="false">
-					<path
-						pathLength="1"
-						d="M0,610 L140,520 L300,600 L430,470 L560,588 L700,430 L840,580 L980,455 L1120,592 L1260,495 L1440,596"></path>
-				</svg>
-				<span class="hero-fx hero-fx--scan"></span>
-				<span class="hero-fx hero-fx--glint hero-fx--glint-lake-west"></span>
-				<span class="hero-fx hero-fx--ember"></span>
-				<span class="hero-fx hero-fx--smoke hero-fx--smoke-1"></span>
-				<span class="hero-fx hero-fx--smoke hero-fx--smoke-2"></span>
-				<span class="hero-fx hero-fx--smoke hero-fx--smoke-3"></span>
-				<span class="hero-fx hero-fx--glint hero-fx--glint-lake-east"></span>
-				<span class="hero-fx hero-fx--ridge-dot hero-fx--ridge-dot-desktop"></span>
-				<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-center"></span>
-				<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-west"></span>
-				<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-east"></span>
-			</div>
-			<!-- MOBILE stage -->
-			<div class="hero__stage hero__stage--mobile">
-				<svg class="hero__terrain" width="390" height="760" aria-hidden="true" focusable="false">
-					<use href="#svgBm"></use>
-				</svg>
-				<svg class="hero__ridge" width="390" height="760" aria-hidden="true" focusable="false">
-					<path pathLength="1" d="M0,640 L70,580 L140,632 L200,550 L260,624 L330,570 L390,634"></path>
-				</svg>
-				<span class="hero-fx hero-fx--scan-mobile"></span>
-				<span class="hero-fx hero-fx--glint hero-fx--glint-lake-mobile"></span>
-				<span class="hero-fx hero-fx--ridge-dot hero-fx--ridge-dot-mobile"></span>
-				<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-mobile-west"></span>
-				<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-mobile-east"></span>
+			<!-- Decorative artwork layer. Absolutely positioned and clipped, so the hero
+			     itself is free to grow for its content on short viewports. -->
+			<div class="hero__art" aria-hidden="true">
+				<!-- DESKTOP stage: terrain + ridge draw + overlay spans -->
+				<div class="hero__stage hero__stage--desktop">
+					<svg class="hero__terrain" width="1440" height="760" aria-hidden="true" focusable="false">
+						<use href="#svgB"></use>
+					</svg>
+					<svg class="hero__ridge" width="1440" height="760" aria-hidden="true" focusable="false">
+						<path
+							pathLength="1"
+							d="M0,610 L140,520 L300,600 L430,470 L560,588 L700,430 L840,580 L980,455 L1120,592 L1260,495 L1440,596"></path>
+					</svg>
+					<span class="hero-fx hero-fx--scan"></span>
+					<span class="hero-fx hero-fx--glint hero-fx--glint-lake-west"></span>
+					<span class="hero-fx hero-fx--ember"></span>
+					<span class="hero-fx hero-fx--smoke hero-fx--smoke-1"></span>
+					<span class="hero-fx hero-fx--smoke hero-fx--smoke-2"></span>
+					<span class="hero-fx hero-fx--smoke hero-fx--smoke-3"></span>
+					<span class="hero-fx hero-fx--glint hero-fx--glint-lake-east"></span>
+					<span class="hero-fx hero-fx--ridge-dot hero-fx--ridge-dot-desktop"></span>
+					<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-center"></span>
+					<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-west"></span>
+					<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-east"></span>
+				</div>
+				<!-- MOBILE stage -->
+				<div class="hero__stage hero__stage--mobile">
+					<svg class="hero__terrain" width="390" height="760" aria-hidden="true" focusable="false">
+						<use href="#svgBm"></use>
+					</svg>
+					<svg class="hero__ridge" width="390" height="760" aria-hidden="true" focusable="false">
+						<path pathLength="1" d="M0,640 L70,580 L140,632 L200,550 L260,624 L330,570 L390,634"></path>
+					</svg>
+					<span class="hero-fx hero-fx--scan-mobile"></span>
+					<span class="hero-fx hero-fx--glint hero-fx--glint-lake-mobile"></span>
+					<span class="hero-fx hero-fx--ridge-dot hero-fx--ridge-dot-mobile"></span>
+					<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-mobile-west"></span>
+					<span class="hero-fx hero-fx--pulse hero-fx--pulse-summit-mobile-east"></span>
+				</div>
 			</div>
 
 			<!-- Shared top bar (single copy, responsive via CSS) -->
@@ -181,7 +194,7 @@
 
 		<main class="content" id="main" tabindex="-1">
 			<section class="wrap" aria-labelledby="whatido">
-				<h2 class="kicker" id="whatido">WHAT I DO</h2>
+				<h2 class="kicker" id="whatido">What I do</h2>
 				<p class="prose">
 					I help build A/B testing infrastructure, custom apps, and theme platforms for high-volume Shopify storefronts.
 					The job is shipping experiments to millions of sessions without breaking checkout, and building the React and
@@ -223,7 +236,7 @@
 			<hr class="rule" />
 
 			<section class="wrap" id="work" aria-labelledby="work-h">
-				<h2 class="kicker" id="work-h">SELECTED WORK</h2>
+				<h2 class="kicker" id="work-h">Selected work</h2>
 				<div class="work-list">
 					<article class="work-card">
 						<svg width="150" height="90" viewBox="0 0 150 90" aria-hidden="true" focusable="false">
@@ -283,7 +296,7 @@
 			<hr class="rule" />
 
 			<section class="wrap" id="off-the-clock" aria-labelledby="otc-h">
-				<h2 class="kicker" id="otc-h">OFF THE CLOCK</h2>
+				<h2 class="kicker" id="otc-h">Off the clock</h2>
 				<div class="hobby-grid">
 					<article class="hobby-card">
 						<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#icSprout"></use></svg>
@@ -348,13 +361,14 @@
 					<a class="btn" href="mailto:mike@robertsmj.com">Hiring? Let's talk</a>
 				</div>
 				<div class="footer__bottom">
-					<!-- Resume is still a stub: /resume.pdf does not exist yet and 404s. Ship the
-					     PDF or drop the link. LinkedIn is live. -->
+					<!-- To re-add the resume once the PDF exists, drop it at public/resume.pdf and
+					     restore: <a href="/resume.pdf">Resume (PDF)</a>
+					     It was removed rather than left pointing at a 404, which is a bad look on a
+					     hiring page. test/markup.test.js fails if a footer link 404s again. -->
 					<div class="footer__links">
 						<a href="mailto:mike@robertsmj.com">mike@robertsmj.com</a>
 						<a href="https://github.com/robertsmikej" target="_blank" rel="noopener">GitHub</a>
 						<a href="https://www.linkedin.com/in/robertsmichaelj/" target="_blank" rel="noopener">LinkedIn</a>
-						<a href="/resume.pdf" data-stub="resume">Resume (PDF)</a>
 					</div>
 					<span class="footer__copy">&copy; 2026 MIKE ROBERTS, TREASURE VALLEY, IDAHO</span>
 				</div>

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { loadIndexPage } from './helpers/page.js';
+import { loadIndexPage, publicFileExists } from './helpers/page.js';
 
 /**
  * Whole-document invariants. These are the things a refactor can quietly break
@@ -80,6 +80,19 @@ describe('in-page links', () => {
 			.filter((id) => !id || !doc.getElementById(id));
 
 		expect(broken).toEqual([]);
+	});
+
+	it('points every internal link and asset at a file that gets deployed', () => {
+		// The footer's "Resume (PDF)" link pointed at /resume.pdf for weeks, 404ing to a
+		// blank page on a hiring site. This is the guard against that recurring.
+		const urls = [
+			...[...doc.querySelectorAll('a[href^="/"]')].map((el) => el.getAttribute('href')),
+			...[...doc.querySelectorAll('link[href^="/"]')].map((el) => el.getAttribute('href')),
+			...[...doc.querySelectorAll('script[src^="/"], img[src^="/"]')].map((el) => el.getAttribute('src')),
+		].filter((url) => url !== null && !url.startsWith('//'));
+
+		expect(urls.length).toBeGreaterThan(0);
+		expect(urls.filter((url) => !publicFileExists(/** @type {string} */ (url)))).toEqual([]);
 	});
 
 	it('opens external links without handing over the opener', () => {

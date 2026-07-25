@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Page not found, robertsmj.com</title>
+		<meta name="robots" content="noindex" />
+		<meta name="theme-color" content="#0C1116" />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<!-- No inline script here on purpose. This page has no theme toggle, so it renders
+		     from the dark :root tokens, and staying script-free means it needs no CSP hash
+		     of its own. Styles come from the shared stylesheet: an inline <style> would be
+		     blocked by style-src-elem. -->
+		<link rel="stylesheet" href="/styles.css" />
+	</head>
+	<body>
+		<main class="content" id="main">
+			<section class="wrap notfound">
+				<p class="kicker">Error 404</p>
+				<h1 class="notfound__title">This page doesn't exist</h1>
+				<p class="prose">
+					Nothing lives at that address. It may have moved, or the link may have been mistyped. The homepage has
+					everything.
+				</p>
+				<a class="btn notfound__cta" href="/">Back to the homepage</a>
+			</section>
+		</main>
+	</body>
+</html>

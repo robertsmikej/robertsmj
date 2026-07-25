@@ -17,6 +17,11 @@ export default defineConfig({
 		coverage: {
 			provider: 'v8',
 			include: ['public/**/*.js'],
+			// Verifying a refactor is visually neutral means serving the previous commit
+			// under this origin, which drops a copy of the old sources here. It is
+			// gitignored and temporary, but while present it halves the reported coverage
+			// and makes the number look like a regression.
+			exclude: ['public/__baseline/**'],
 			reporter: ['text', 'html'],
 		},
 	},

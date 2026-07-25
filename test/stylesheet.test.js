@@ -43,6 +43,20 @@ describe('skip link (WCAG 2.4.1)', () => {
 	it('reveals on :focus, not :focus-visible, so it works however focus arrived', () => {
 		expect(STYLES_CSS).toMatch(/\.skip-link:focus\s*\{[^}]*transform:\s*translate\(-50%,\s*0\)/);
 	});
+
+	it('sits far enough from the viewport edge that its focus ring is not cropped', () => {
+		// Measured in Chrome: the ring's outer edge lands at `top` minus outline-offset
+		// minus outline-width. At top: 3px that was -2px, so the ring was clipped along
+		// the top even though the link itself was visible.
+		const focusBlock = STYLES_CSS.match(/:focus-visible\s*\{([^}]*)\}/)?.[1] ?? '';
+		const outlineWidth = Number(focusBlock.match(/outline:\s*(\d+(?:\.\d+)?)px/)?.[1]);
+		const outlineOffset = Number(focusBlock.match(/outline-offset:\s*(\d+(?:\.\d+)?)px/)?.[1]);
+		const skipTop = Number(STYLES_CSS.match(/\.skip-link:focus\s*\{[^}]*top:\s*(\d+(?:\.\d+)?)px/)?.[1]);
+
+		expect(outlineWidth).toBeGreaterThan(0);
+		expect(outlineOffset).toBeGreaterThan(0);
+		expect(skipTop).toBeGreaterThanOrEqual(outlineOffset + outlineWidth);
+	});
 });
 
 describe('reduced motion (WCAG 2.3.3)', () => {
@@ -68,6 +82,40 @@ describe('reduced motion (WCAG 2.3.3)', () => {
 		const block = STYLES_CSS.match(/@media \(prefers-reduced-motion: reduce\)\s*\{([\s\S]*)\}\s*$/)?.[1] ?? '';
 
 		expect(block).toMatch(/scroll-behavior:\s*auto/);
+	});
+});
+
+describe('hero reflow (WCAG 1.4.10)', () => {
+	// A fixed height plus overflow:hidden on `.hero`, with absolutely positioned
+	// content, silently cut off the tagline and the primary CTA on short viewports:
+	// 192px lost at 320x256, and the CTA sliced at iPhone-landscape widths.
+
+	it('bounds the hero with min-height so it can grow for its content', () => {
+		const heroBlock = STYLES_CSS.match(/^\.hero\s*\{([^}]*)\}/m)?.[1] ?? '';
+
+		expect(heroBlock).toMatch(/min-height:/);
+		expect(heroBlock).not.toMatch(/[^-]height:\s*calc/);
+	});
+
+	it('does not clip the hero itself', () => {
+		expect(STYLES_CSS.match(/^\.hero\s*\{([^}]*)\}/m)?.[1]).not.toMatch(/overflow:/);
+	});
+
+	it('clips the artwork layer instead', () => {
+		expect(STYLES_CSS).toMatch(/\.hero__art\s*\{[^}]*overflow:\s*hidden/);
+	});
+
+	it('keeps the hero content in normal flow', () => {
+		const content = STYLES_CSS.match(/^\.hero__content\s*\{([^}]*)\}/m)?.[1] ?? '';
+
+		expect(content).toMatch(/position:\s*relative/);
+		expect(content).toMatch(/margin-top:/);
+		expect(content).not.toMatch(/position:\s*absolute/);
+	});
+
+	it('uses min-height at the mobile breakpoint too', () => {
+		expect(STYLES_CSS).toMatch(/min-height:\s*100svh/);
+		expect(STYLES_CSS).not.toMatch(/[^-]height:\s*100svh/);
 	});
 });
 

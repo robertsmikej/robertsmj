@@ -49,6 +49,7 @@ public/            served assets
   theme.js         pure theme resolution (no DOM, no storage)
   theme-toggle.js  theme toggle DOM wiring; takes a Document, so it is testable
   main.js          entry point: wiring only, no logic
+  404.html         served for unmatched paths (wrangler not_found_handling)
   _headers         CSP (inline script allowed by hash) and hardening headers
   robots.txt       + sitemap.xml
   favicon.svg      mint ridgeline mark
@@ -72,8 +73,9 @@ The hero is a fixed design canvas (1440x760 desktop, 390x760 mobile) scaled to t
 the hand-placed overlay coordinates stay aligned with the terrain artwork. That scaling is pure CSS and
 needs no JavaScript.
 
-## To do before launch
+## Adding the resume
 
-- The footer Resume link points at `/resume.pdf`, which does not exist yet and currently 404s. It is
-  marked `data-stub="resume"`. Drop the PDF into `public/` (or remove the link) before sharing the site
-  with anyone hiring.
+The footer used to carry a `Resume (PDF)` link pointing at `/resume.pdf`, which did not exist and 404'd.
+It was removed rather than left broken. To put it back, drop the file at `public/resume.pdf` and restore
+one line in the footer (there is a comment there with the markup). `test/markup.test.js` fails if any
+internal link points at a file that will not be deployed, so a broken version cannot come back quietly.

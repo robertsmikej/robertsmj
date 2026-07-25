@@ -1,4 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#0A1414"/>
-  <path d="M2,24 L8,15 L13,21 L19,10 L24,19 L30,12" fill="none" stroke="#5FD4A0" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- Palette matches the site's dark theme: --bg #0C1116 and --ac glacier cyan #45B2E6.
+       It was mint green (#5FD4A0 on #0A1414), left over from an earlier direction. -->
+  <rect width="32" height="32" rx="6" fill="#0C1116"/>
+  <path d="M2,24 L8,15 L13,21 L19,10 L24,19 L30,12" fill="none" stroke="#45B2E6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
 </svg>

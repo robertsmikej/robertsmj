@@ -172,6 +172,10 @@ h3 {
 }
 .skip-link:focus {
 	transform: translate(-50%, 0);
+	/* Clear of the viewport edge so the focus ring is not cropped along its top. The
+	   ring's outer edge sits at `top` minus outline-offset (3px) minus outline-width
+	   (2px), so this needs to be at least 5px. */
+	top: 6px;
 }
 
 /* ---- Motion ---- */
@@ -281,29 +285,52 @@ h3 {
 	}
 }
 
-/* ---- Hero ---- */
+/* ---- Hero ----
+
+   `min-height`, not `height`, and the content sits in normal flow. With a fixed height
+   plus `overflow: hidden` and absolutely positioned content, a short viewport silently
+   cut the tagline and the primary CTA off with no way to scroll to them: 192px lost at
+   320x256 (400% zoom of 1280x1024), and the bottom of the CTA sliced off at any width
+   from 769px to ~866px, which includes iPhone landscape. WCAG 1.4.10 Reflow.
+
+   The hero is a flex column so the content's top margin cannot collapse out through
+   the hero's top edge and push the whole header down. */
 .hero {
 	position: relative;
+	display: flex;
+	flex-direction: column;
 	/* The unscaled canvas height. This is the fallback partner to --hero-scale: 1
-	   below, and the two have to agree. Scaling the height by viewport width while
+	   above, and the two have to agree. Scaling the height by viewport width while
 	   the stage inside it stayed unscaled would crop the bottom of the terrain (~11%
 	   at 1280px, ~30% at 1000px), and what gets cut is exactly the detail band: the
 	   tent, the campfire, and both lake glints at y=682-716. */
-	height: calc(var(--hero-canvas-h) * 1px);
-	overflow: hidden;
+	min-height: calc(var(--hero-canvas-h) * 1px);
 }
 @supports (line-height: calc(100vw / 1px)) {
 	.hero {
-		height: calc(100vw * var(--hero-canvas-h) / var(--hero-canvas-w));
+		min-height: calc(100vw * var(--hero-canvas-h) / var(--hero-canvas-w));
 	}
+}
+
+/* The artwork layer. Clipping lives here rather than on `.hero`, so the hero is free
+   to grow for its content while the scaled canvas is still cropped to the frame. */
+.hero__art {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	pointer-events: none;
 }
 .hero__stage {
 	position: absolute;
-	top: 0;
+	/* Bottom-anchored at both breakpoints: identical to top-anchoring whenever the
+	   hero is exactly canvas-height, and when the hero grows for its content the
+	   terrain stays glued to the bottom edge while the extra room appears above it,
+	   which is empty sky either way. */
+	bottom: 0;
 	left: 0;
 	height: calc(var(--hero-canvas-h) * 1px);
 	transform: scale(var(--hero-scale));
-	transform-origin: top left;
+	transform-origin: bottom left;
 }
 .hero__stage--desktop {
 	width: calc(var(--hero-canvas-desktop-w) * 1px);
@@ -313,17 +340,12 @@ h3 {
 	display: none;
 }
 @media (max-width: 768px) {
-	/* One-screen hero: bottom-anchor the terrain so the mountains sit fully in
-	   view and the empty sky above is cropped, instead of a fixed 760px canvas
-	   that overflows the fold on tall phones (e.g. iPhone 15 Pro Max). */
+	/* One-screen hero: the terrain is already bottom-anchored, so the mountains sit
+	   fully in view and the empty sky above is cropped, instead of a fixed 760px
+	   canvas that overflows the fold on tall phones (e.g. iPhone 15 Pro Max). */
 	.hero {
-		height: 100vh;
-		height: 100svh;
-	}
-	.hero__stage {
-		top: auto;
-		bottom: 0;
-		transform-origin: bottom left;
+		min-height: 100vh;
+		min-height: 100svh;
 	}
 	.hero__stage--desktop {
 		display: none;
@@ -539,6 +561,7 @@ h3 {
 	color: var(--tx);
 }
 .toggle {
+	position: relative;
 	width: 34px;
 	height: 18px;
 	border: 1px solid var(--tx2);
@@ -549,6 +572,18 @@ h3 {
 	padding: 0 2px;
 	cursor: pointer;
 	justify-content: flex-start;
+}
+/* The switch is 34x18, which is a poor thumb target on a phone. This grows the hit
+   area to 44x44 without touching the visual or the layout, since the pseudo-element
+   is absolutely positioned. WCAG 2.5.8 target size. */
+.toggle::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 44px;
+	height: 44px;
+	transform: translate(-50%, -50%);
 }
 .toggle__knob {
 	width: 12px;
@@ -570,19 +605,21 @@ h3 {
 	}
 }
 
-/* ---- Hero content ---- */
+/* ---- Hero content ----
+   In normal flow (a flex item of `.hero`) rather than absolutely positioned, so the
+   hero grows to contain it instead of clipping it. The 170px offset that used to be
+   `top` is now a margin, and the bottom padding keeps the CTA off the hero's edge on
+   the short viewports where content, not the canvas, decides the height. */
 .hero__content {
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 170px;
+	position: relative;
 	z-index: 2;
+	margin-top: 170px;
 	display: flex;
 	flex-direction: column;
 	gap: 26px;
 	align-items: center;
 	text-align: center;
-	padding: 0 48px;
+	padding: 0 48px 48px;
 }
 .hero__name {
 	font:
@@ -610,13 +647,13 @@ h3 {
 }
 @media (max-width: 768px) {
 	.hero__content {
-		top: 150px;
+		margin-top: 150px;
 		align-items: flex-start;
 		text-align: left;
 		gap: 20px;
-		left: 24px;
-		right: 24px;
-		padding: 0;
+		/* Was left/right: 24px on an absolutely positioned box; as a flow item the
+		   same inset comes from padding. */
+		padding: 0 24px 40px;
 	}
 	.hero__name {
 		font-size: 50px;
@@ -801,6 +838,30 @@ h3 {
 @media (max-width: 768px) {
 	.hobby-grid {
 		grid-template-columns: 1fr;
+	}
+}
+
+/* ---- 404 ----
+   Built from the shared components so the page needs no stylesheet of its own. */
+.notfound {
+	padding: 40px 0 120px;
+}
+.notfound__title {
+	font:
+		600 44px/1.15 'Space Grotesk',
+		'Instrument Sans',
+		system-ui,
+		sans-serif;
+	color: var(--tx);
+	letter-spacing: -0.02em;
+}
+.notfound__cta {
+	/* .wrap stretches its children, which would make the button full width. */
+	align-self: flex-start;
+}
+@media (max-width: 768px) {
+	.notfound__title {
+		font-size: 32px;
 	}
 }
 

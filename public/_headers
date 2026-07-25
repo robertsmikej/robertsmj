@@ -22,7 +22,7 @@
 # test/csp.test.js recomputes it from the HTML and fails if they drift.
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-/MtrLusM4IW752JCw1kd3kPYKTl9Gx7EFMTC5AcE7uU='; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-0NP5ykYNoOaj2DhjvQctX0k/yltI6arlX1LJpDSNADU='; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'
   Referrer-Policy: strict-origin-when-cross-origin
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY

@@ -80,10 +80,21 @@ first paint, and an ES module import would be deferred and flash the wrong theme
 `test/no-flash-script.test.js` extracts and executes the real snippet against
 `resolveTheme()`, so the copies cannot drift.
 
-**The page background exists in three places** and cannot be reduced to one: `--bg`
-in `styles.css`, `THEME_BACKGROUNDS` in `theme-toggle.js`, and the initial `content`
-of the theme-color meta tag (which must be right before any CSS or JS runs).
-`test/theme-color.test.js` pins all three together.
+**The page background exists in four places** and cannot be reduced to one: `--bg` in
+`styles.css`, `THEME_BACKGROUNDS` in `theme-toggle.js`, the initial `content` of the
+theme-color meta tag, and the two hex literals in the inline no-flash script (which
+updates that meta tag pre-paint, so a returning light-theme visitor does not watch
+mobile browser chrome change colour). Nothing that runs that early can import a
+module. `test/theme-color.test.js` and `test/no-flash-script.test.js` pin all four.
+
+**The hero must never go back to a fixed `height` with `overflow: hidden`.** That
+combination, with absolutely positioned content, clipped the tagline and the primary
+CTA off short viewports with no way to scroll to them: 192px lost at 320x256 (400%
+zoom) and the CTA sliced at iPhone-landscape widths. WCAG 1.4.10. It is now
+`min-height` on a flex column, the content is in normal flow, and clipping lives on
+the `.hero__art` wrapper. `test/stylesheet.test.js` fails if any of that is undone.
+The flex column is also load-bearing: as a plain block, the content's `margin-top`
+would collapse out through the hero's top edge and push the whole header down.
 
 **Hero sizing is CSS, not JavaScript.** `--hero-scale` is
 `calc(100vw / (var(--hero-canvas-w) * 1px))` behind an `@supports` guard, and `.hero`'s
@@ -124,6 +135,7 @@ public/            served assets
   theme.js         pure theme resolution, no DOM
   theme-toggle.js  DOM wiring, takes a Document so it is testable
   main.js          entry point, wiring only, no logic
+  404.html         unmatched paths; no inline script, so it needs no CSP hash
   _headers         CSP (hashed inline script) and hardening headers
   robots.txt, sitemap.xml
   favicon.svg, og.png, fonts/

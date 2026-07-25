@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -17,6 +17,22 @@ const PUBLIC_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'pu
  */
 export function readPublicFile(name) {
 	return readFileSync(join(PUBLIC_DIR, name), 'utf8');
+}
+
+/**
+ * Does a root-relative URL resolve to a file that will actually be deployed?
+ *
+ * `/` and any extension-less path map to the directory's index.html, matching how the
+ * Workers assets handler serves them.
+ *
+ * @param {string} urlPath
+ * @returns {boolean}
+ */
+export function publicFileExists(urlPath) {
+	const withoutQuery = urlPath.split(/[?#]/)[0] ?? '';
+	const relative = withoutQuery.replace(/^\//, '');
+	const target = relative === '' || relative.endsWith('/') ? `${relative}index.html` : relative;
+	return existsSync(join(PUBLIC_DIR, target));
 }
 
 export const INDEX_HTML = readPublicFile('index.html');
