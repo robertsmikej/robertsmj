@@ -19,11 +19,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - name: Install deps
         run: npm ci
 
-      - name: Run tests
+      # Same gates as ci.yml. A push straight to main skips CI, so main has to
+      # re-prove formatting, lint, and types before it ships to production.
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
         run: npm test
 
       - name: Deploy to Cloudflare Workers
