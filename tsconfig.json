@@ -1,0 +1,34 @@
+{
+	// There is no TypeScript in this repo and no build step. This config exists so
+	// `npm run typecheck` type-checks the plain JS through its JSDoc annotations,
+	// which is the only static type safety available here. It emits nothing.
+	"compilerOptions": {
+		"target": "ES2023",
+		"module": "ES2022",
+		"moduleResolution": "Bundler",
+		"lib": ["ES2023", "DOM", "DOM.Iterable"],
+
+		"allowJs": true,
+		"checkJs": true,
+		"noEmit": true,
+
+		"strict": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true,
+		"noImplicitOverride": true,
+
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"skipLibCheck": true
+	},
+	"include": ["public/**/*.js", "test/**/*.js"],
+	"exclude": ["node_modules", ".wrangler", "coverage", "docs/design-handoff"]
+}

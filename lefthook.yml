@@ -1,0 +1,7 @@
+pre-commit:
+  jobs:
+    # --ignore-unknown so staging a file Prettier has no parser for (.editorconfig,
+    # .prettierignore, fonts) skips it instead of failing the whole commit.
+    - name: prettier
+      run: npx prettier --write --ignore-unknown {staged_files}
+      stage_fixed: true

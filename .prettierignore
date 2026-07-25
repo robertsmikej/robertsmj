@@ -1,0 +1,15 @@
+node_modules/
+.wrangler/
+package-lock.json
+
+# Binary and generated assets.
+public/fonts/
+public/og.png
+public/favicon.svg
+
+# Vendored design handoff. This is the visual source of truth, kept byte-for-byte
+# as delivered so it stays diffable against the original.
+docs/design-handoff/
+
+# Superpowers working files (captured diffs, agent reports, screenshots).
+.superpowers/
