@@ -9,9 +9,18 @@ on:
 # CampWatch learned this the hard way: when only the deploy workflow runs checks,
 # a green deploy can sit on top of unformatted or untyped code. Every gate that
 # guards main runs here too, so a branch is provably clean before it merges.
+#
+# Keyed on head_ref so the `push` and `pull_request` events for the same branch land
+# in one group. Keyed on github.ref they would differ (refs/heads/x vs refs/pull/N/merge)
+# and every push to an open PR would run the whole suite twice.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
+
+# Nothing here writes to the repo, and the deploy authenticates to Cloudflare with its
+# own secret, so the default token grant is more than either workflow needs.
+permissions:
+  contents: read
 
 jobs:
   check:

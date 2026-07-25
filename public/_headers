@@ -13,13 +13,19 @@
 # rewriting artwork the design spec requires kept verbatim, to close a hole that
 # has no way to be reached on a page that renders no external data.
 #
+# style-src-elem 'self' recovers most of that ground for free: style *attributes*
+# fall back through style-src-attr to style-src (so the artwork still paints), while
+# an injected inline <style> element is blocked. Engines without the directive ignore
+# it and behave exactly as before.
+#
 # The script hash below must match the inline <script> in index.html byte for byte.
 # test/csp.test.js recomputes it from the HTML and fails if they drift.
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-/MtrLusM4IW752JCw1kd3kPYKTl9Gx7EFMTC5AcE7uU='; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-/MtrLusM4IW752JCw1kd3kPYKTl9Gx7EFMTC5AcE7uU='; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'
   Referrer-Policy: strict-origin-when-cross-origin
   X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
   Strict-Transport-Security: max-age=31536000; includeSubDomains

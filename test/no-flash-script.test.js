@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveTheme } from '../public/theme.js';
+import { resolveTheme, STORAGE_KEY } from '../public/theme.js';
 
-import { INDEX_HTML } from './helpers/page.js';
+import { INDEX_HTML, NO_FLASH_SCRIPT } from './helpers/page.js';
 
 /**
  * The inline `<script>` in index.html reimplements resolveTheme() because it has to
@@ -12,13 +12,6 @@ import { INDEX_HTML } from './helpers/page.js';
  * Rather than trust the comment that says the two agree, these tests pull the real
  * snippet out of index.html and execute it, so drift fails the build.
  */
-const inlineScript = (() => {
-	const body = INDEX_HTML.match(/<script>([\s\S]*?)<\/script>/)?.[1];
-	if (!body) {
-		throw new Error('No inline <script> found in index.html; the no-flash theme init is missing.');
-	}
-	return body;
-})();
 
 /**
  * Run the extracted snippet with stubbed globals and report what it set `data-theme`
@@ -32,11 +25,12 @@ function runInlineScript({ stored = null, throwOnRead = false }) {
 	/** @type {string | null} */
 	let applied = null;
 	const localStorageStub = {
-		getItem() {
+		/** @param {string} key */
+		getItem(key) {
 			if (throwOnRead) {
 				throw new Error('Access denied for this document origin.');
 			}
-			return stored;
+			return key === STORAGE_KEY ? stored : null;
 		},
 	};
 	const documentStub = {
@@ -55,33 +49,59 @@ function runInlineScript({ stored = null, throwOnRead = false }) {
 
 	// Executing the shipped snippet verbatim is the whole point: passing the globals it
 	// reads as parameters shadows the real ones without mutating anything.
-	new Function('localStorage', 'document', inlineScript)(localStorageStub, documentStub);
+	new Function('localStorage', 'document', NO_FLASH_SCRIPT)(localStorageStub, documentStub);
 	return applied;
 }
 
 describe('inline no-flash theme script', () => {
-	it('is present and sets data-theme before paint', () => {
-		expect(inlineScript).toContain('data-theme');
+	it('applies the stored theme', () => {
 		expect(runInlineScript({ stored: 'light' })).toBe('light');
 	});
 
 	it('agrees with resolveTheme on every input, valid or not', () => {
-		const inputs = [null, undefined, '', 'dark', 'light', 'DARK', 'Light', 'purple', 'dark ', '0', 'null'];
+		const inputs = [null, '', 'dark', 'light', 'DARK', 'Light', 'purple', 'dark ', '0', 'null', '{"t":"light"}'];
 
-		for (const stored of inputs) {
-			expect(runInlineScript({ stored: /** @type {string | null} */ (stored ?? null) })).toBe(
-				resolveTheme(/** @type {string | null | undefined} */ (stored)),
-			);
-		}
+		// Compared as whole arrays so a failure names the input that drifted, rather
+		// than stopping at the first mismatch inside a loop.
+		expect(inputs.map((stored) => runInlineScript({ stored }))).toEqual(inputs.map(resolveTheme));
 	});
 
 	it('survives storage access throwing, leaving the CSS default in place', () => {
 		// Safari private mode and blocked-cookie contexts throw on getItem.
-		expect(() => runInlineScript({ throwOnRead: true })).not.toThrow();
 		expect(runInlineScript({ throwOnRead: true })).toBeNull();
 	});
 
 	it('reads the same storage key the module writes', () => {
-		expect(inlineScript).toContain("'theme'");
+		// Interpolated, not hardcoded: renaming STORAGE_KEY has to fail here.
+		expect(NO_FLASH_SCRIPT).toContain(`'${STORAGE_KEY}'`);
+	});
+});
+
+describe('no-flash script placement', () => {
+	// The entire reason this script is inline and duplicated is that it must run before
+	// the first paint. Nothing about that is guaranteed by its content, only by where it
+	// sits, so position is asserted rather than left to a comment.
+
+	it('runs before the stylesheet is requested', () => {
+		const scriptEnd = INDEX_HTML.indexOf('</script>');
+		const stylesheet = INDEX_HTML.indexOf('rel="stylesheet"');
+
+		expect(scriptEnd).toBeGreaterThan(-1);
+		expect(stylesheet).toBeGreaterThan(-1);
+		expect(scriptEnd).toBeLessThan(stylesheet);
+	});
+
+	it('sits inside <head>, not deferred to the end of the body', () => {
+		const scriptStart = INDEX_HTML.indexOf('<script');
+		const headEnd = INDEX_HTML.indexOf('</head>');
+
+		expect(scriptStart).toBeLessThan(headEnd);
+	});
+
+	it('is not preceded by any external script that could delay it', () => {
+		const firstInline = INDEX_HTML.indexOf('<script');
+		const firstExternal = INDEX_HTML.search(/<script[^>]*\bsrc=/);
+
+		expect(firstExternal).toBeGreaterThan(firstInline);
 	});
 });

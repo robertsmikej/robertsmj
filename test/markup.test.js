@@ -7,6 +7,10 @@ import { loadIndexPage } from './helpers/page.js';
  * without any single unit test noticing: a renamed SVG symbol, a nav link pointing
  * at a section that got an id rename, a heading level skipped when a `div` becomes
  * an `h3`, or inline styles creeping back into the markup.
+ *
+ * Every "nothing is broken" assertion is paired with a check that the set it filtered
+ * was non-empty. An absence-assertion over an empty set is green by accident, and a
+ * mistyped selector would otherwise read as a pass.
  */
 
 /** @type {Document} */
@@ -21,11 +25,15 @@ beforeEach(() => {
  * artwork paints itself with `style="stroke:var(--l2)"` presentation styles and the
  * design spec requires it kept verbatim.
  *
+ * Scoped to the artwork itself plus the single wrapper `<svg>` that holds the `<defs>`.
+ * A looser `el.querySelector('defs')` check would also exempt every *ancestor* of the
+ * library, `<body>` and `<html>` included, which would let a real inline style through.
+ *
  * @param {Element} el
  * @returns {boolean}
  */
 function isInSymbolLibrary(el) {
-	return Boolean(el.closest('defs') || el.querySelector('defs'));
+	return Boolean(el.closest('defs') || (el.tagName === 'svg' && el.querySelector(':scope > defs')));
 }
 
 describe('SVG symbol references', () => {
@@ -39,8 +47,11 @@ describe('SVG symbol references', () => {
 	});
 
 	it('defines no symbols that nothing renders', () => {
+		const symbols = [...doc.querySelectorAll('symbol')];
+		expect(symbols.length).toBeGreaterThan(0);
+
 		const referenced = new Set([...doc.querySelectorAll('use')].map((use) => use.getAttribute('href')));
-		const orphans = [...doc.querySelectorAll('symbol')].map((s) => `#${s.id}`).filter((id) => !referenced.has(id));
+		const orphans = symbols.map((symbol) => `#${symbol.id}`).filter((id) => !referenced.has(id));
 
 		expect(orphans).toEqual([]);
 	});
@@ -59,7 +70,12 @@ describe('in-page links', () => {
 	});
 
 	it('resolves every aria-labelledby to an element that exists', () => {
-		const broken = [...doc.querySelectorAll('[aria-labelledby]')]
+		const labelled = [...doc.querySelectorAll('[aria-labelledby]')];
+		// Without this, stripping every aria-labelledby from the page passes silently
+		// and three sections lose their accessible names.
+		expect(labelled.length).toBeGreaterThan(0);
+
+		const broken = labelled
 			.map((el) => el.getAttribute('aria-labelledby'))
 			.filter((id) => !id || !doc.getElementById(id));
 
@@ -78,7 +94,7 @@ describe('in-page links', () => {
 	});
 });
 
-describe('document structure and accessibility', () => {
+describe('document structure', () => {
 	it('declares a language on the root element', () => {
 		expect(doc.documentElement.getAttribute('lang')).toBe('en');
 	});
@@ -89,15 +105,16 @@ describe('document structure and accessibility', () => {
 
 	it('never skips a heading level', () => {
 		const levels = [...doc.querySelectorAll('h1, h2, h3, h4, h5, h6')].map((h) => Number(h.tagName[1]));
-
+		expect(levels.length).toBeGreaterThan(1);
 		expect(levels[0]).toBe(1);
-		levels.forEach((level, i) => {
-			if (i > 0) {
-				expect(level).toBeLessThanOrEqual(/** @type {number} */ (levels[i - 1]) + 1);
-			}
-		});
-	});
 
+		// Compared as arrays so a failure shows the whole outline, not just one index.
+		const maxAllowed = levels.map((_level, i) => (i === 0 ? 1 : Math.min(levels[i - 1] ?? 1, 6) + 1));
+		expect(levels.map((level, i) => level <= /** @type {number} */ (maxAllowed[i]))).not.toContain(false);
+	});
+});
+
+describe('accessibility affordances', () => {
 	it('offers a skip link that lands on the main landmark', () => {
 		const skip = doc.querySelector('.skip-link');
 		expect(skip).not.toBeNull();
@@ -106,20 +123,38 @@ describe('document structure and accessibility', () => {
 		expect(target?.tagName).toBe('MAIN');
 	});
 
+	it('makes the main landmark focusable so the skip link moves focus', () => {
+		expect(doc.querySelector('main')?.getAttribute('tabindex')).toBe('-1');
+	});
+
 	it('hides decorative SVG from assistive technology', () => {
-		const exposed = [...doc.querySelectorAll('svg')].filter(
-			(svg) => svg.getAttribute('aria-hidden') !== 'true' && !svg.querySelector('title'),
+		const svgs = [...doc.querySelectorAll('svg')];
+		expect(svgs.length).toBeGreaterThan(0);
+
+		// A titled SVG is legitimately exposed, but only its own direct-child <title>
+		// counts. Searching descendants would excuse the symbol library for a title
+		// buried inside <defs>.
+		const exposed = svgs.filter(
+			(svg) => svg.getAttribute('aria-hidden') !== 'true' && !svg.querySelector(':scope > title'),
 		);
 
 		expect(exposed).toEqual([]);
 	});
 
-	it('gives the icon-only theme toggle an accessible name and a pressed state', () => {
-		const toggle = doc.querySelector('[data-theme-toggle]');
+	it('gives the icon-only theme toggle a non-blank accessible name', () => {
+		const label = doc.querySelector('[data-theme-toggle]')?.getAttribute('aria-label');
 
-		expect(toggle?.getAttribute('aria-label')).toBeTruthy();
-		expect(toggle?.getAttribute('aria-pressed')).toBeTruthy();
-		expect(toggle?.getAttribute('type')).toBe('button');
+		expect(label?.trim()).toBeTruthy();
+		expect(label?.trim().length).toBeGreaterThan(3);
+	});
+
+	it('gives the theme toggle a valid pressed state', () => {
+		// toBeTruthy() would accept aria-pressed="banana".
+		expect(['true', 'false']).toContain(doc.querySelector('[data-theme-toggle]')?.getAttribute('aria-pressed'));
+	});
+
+	it('keeps the theme toggle out of implicit form submission', () => {
+		expect(doc.querySelector('[data-theme-toggle]')?.getAttribute('type')).toBe('button');
 	});
 });
 
@@ -127,7 +162,10 @@ describe('presentation stays in the stylesheet', () => {
 	it('keeps inline style attributes out of the markup', () => {
 		// 16 hero overlay spans used to carry their geometry and timings inline. If
 		// they come back, this fails.
-		const inlineStyled = [...doc.querySelectorAll('[style]')]
+		const styled = [...doc.querySelectorAll('[style]')];
+		expect(styled.length).toBeGreaterThan(0);
+
+		const inlineStyled = styled
 			.filter((el) => !isInSymbolLibrary(el))
 			.map((el) => `${el.tagName.toLowerCase()}[style="${el.getAttribute('style')}"]`);
 
@@ -140,16 +178,17 @@ describe('presentation stays in the stylesheet', () => {
 });
 
 describe('head metadata', () => {
-	it('describes the share image for screen reader and preview surfaces', () => {
-		expect(doc.querySelector('meta[property="og:image:alt"]')?.getAttribute('content')).toBeTruthy();
+	it('describes the share image for preview and screen reader surfaces', () => {
+		const alt = doc.querySelector('meta[property="og:image:alt"]')?.getAttribute('content');
+
+		expect(alt?.trim()).toBeTruthy();
+		expect(alt?.trim().length).toBeGreaterThan(10);
 	});
 
 	it('loads page script as a deferred module, never blocking render', () => {
 		const scripts = [...doc.querySelectorAll('script[src]')];
 		expect(scripts.length).toBeGreaterThan(0);
 
-		for (const script of scripts) {
-			expect(script.getAttribute('type')).toBe('module');
-		}
+		expect(scripts.map((script) => script.getAttribute('type'))).toEqual(scripts.map(() => 'module'));
 	});
 });

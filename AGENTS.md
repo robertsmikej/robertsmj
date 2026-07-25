@@ -86,14 +86,30 @@ of the theme-color meta tag (which must be right before any CSS or JS runs).
 `test/theme-color.test.js` pins all three together.
 
 **Hero sizing is CSS, not JavaScript.** `--hero-scale` is
-`calc(100vw / (var(--hero-canvas-w) * 1px))` behind an `@supports` guard. Do not
-reintroduce a resize handler for it. If you change a canvas dimension, change the
-`--hero-canvas-*` custom properties, not the numbers in the SVG artwork.
+`calc(100vw / (var(--hero-canvas-w) * 1px))` behind an `@supports` guard, and `.hero`'s
+scaled height sits inside that same guard so the fallback stays self-consistent (a
+scaled box around an unscaled stage crops the terrain's detail band). Do not
+reintroduce a resize handler.
+
+Changing a canvas dimension is not a one-line edit. The 1440x760 and 390x760 numbers
+live in **four** places that must move together:
+
+1. the `--hero-canvas-*` custom properties in `styles.css`,
+2. the `<svg width/height>` attributes and `<symbol viewBox>` values in `index.html`,
+3. the scan keyframes (`@keyframes scan` translates `1438px`, `scanM` `388px`),
+4. both ridge geometries: the `offset-path: path(...)` on `.hero-fx--ridge-dot-*` and
+   the matching `d` attribute in the artwork.
+
+Changing only the custom properties resizes and rescales the stage box while the
+artwork stays put.
 
 **`test/main.test.js` is the only file using the jsdom environment**, via a
 `@vitest-environment jsdom` docblock, because `main.js` reads the ambient `document`.
-Everything else builds its own JSDOM and passes it in, which keeps tests independent
-without resetting globals.
+Everything else builds its own JSDOM and passes it in, which keeps those tests
+independent by construction. `main.test.js` cannot be, so it tracks the listeners
+`main.js` attaches and removes them in `afterEach`: resetting `innerHTML` discards
+element listeners but never document-level ones, and a surviving `DOMContentLoaded`
+handler silently wires later tests. There is a test asserting that cleanup works.
 
 **On Node 26 the test run prints `ExperimentalWarning: localStorage is not
 available`.** That is Node's own experimental global, not this code. CI runs Node 22

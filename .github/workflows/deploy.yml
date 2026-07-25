@@ -5,10 +5,14 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Don't let two deploys race; newer push wins.
+# Don't let two deploys race. Queue rather than cancel: killing a run mid-deploy leaves
+# you reasoning about where it landed, and queueing means pushes ship in order.
 concurrency:
   group: deploy-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
+
+permissions:
+  contents: read
 
 jobs:
   deploy:

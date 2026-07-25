@@ -284,8 +284,18 @@ h3 {
 /* ---- Hero ---- */
 .hero {
 	position: relative;
-	height: calc(100vw * var(--hero-canvas-h) / var(--hero-canvas-w));
+	/* The unscaled canvas height. This is the fallback partner to --hero-scale: 1
+	   below, and the two have to agree. Scaling the height by viewport width while
+	   the stage inside it stayed unscaled would crop the bottom of the terrain (~11%
+	   at 1280px, ~30% at 1000px), and what gets cut is exactly the detail band: the
+	   tent, the campfire, and both lake glints at y=682-716. */
+	height: calc(var(--hero-canvas-h) * 1px);
 	overflow: hidden;
+}
+@supports (line-height: calc(100vw / 1px)) {
+	.hero {
+		height: calc(100vw * var(--hero-canvas-h) / var(--hero-canvas-w));
+	}
 }
 .hero__stage {
 	position: absolute;
@@ -408,31 +418,35 @@ h3 {
 	background: var(--wm);
 	animation: glint 2.4s ease-in-out 2.6s infinite;
 }
+/* Each variant carries the whole `animation` shorthand, delay included, rather than
+   inheriting the shorthand from the base class and overriding `animation-delay`.
+   The shorthand resets delay to 0, so the override-from-a-sibling-class version only
+   worked because these rules happened to sit lower in the file; reordering them would
+   silently collapse the stagger and fire all three puffs at once. */
 .hero-fx--smoke {
 	border: 1px solid var(--tx2);
 	border-radius: 50%;
-	animation: smoke 5s linear infinite;
 }
 .hero-fx--smoke-1 {
 	left: 455px;
 	top: 682px;
 	width: 5px;
 	height: 5px;
-	animation-delay: 2.8s;
+	animation: smoke 5s linear 2.8s infinite;
 }
 .hero-fx--smoke-2 {
 	left: 457px;
 	top: 682px;
 	width: 4px;
 	height: 4px;
-	animation-delay: 4.5s;
+	animation: smoke 5s linear 4.5s infinite;
 }
 .hero-fx--smoke-3 {
 	left: 454px;
 	top: 682px;
 	width: 3px;
 	height: 3px;
-	animation-delay: 6.2s;
+	animation: smoke 5s linear 6.2s infinite;
 }
 
 /* Gold dot that travels the ridge line. The offset-path repeats the ridge geometry
@@ -456,38 +470,38 @@ h3 {
 	animation: travel 8s linear 1.8s infinite;
 }
 
-/* Expanding rings on the summit markers. */
+/* Expanding rings on the summit markers. Full shorthand per variant, for the same
+   ordering reason as the smoke puffs above. */
 .hero-fx--pulse {
 	width: 10px;
 	height: 10px;
 	border: 1.5px solid var(--ac);
 	border-radius: 50%;
-	animation: pulse 3.4s ease-out infinite;
 }
 .hero-fx--pulse-summit-center {
 	left: 695px;
 	top: 425px;
-	animation-delay: 2.2s;
+	animation: pulse 3.4s ease-out 2.2s infinite;
 }
 .hero-fx--pulse-summit-west {
 	left: 425px;
 	top: 465px;
-	animation-delay: 3.4s;
+	animation: pulse 3.4s ease-out 3.4s infinite;
 }
 .hero-fx--pulse-summit-east {
 	left: 1255px;
 	top: 490px;
-	animation-delay: 4.6s;
+	animation: pulse 3.4s ease-out 4.6s infinite;
 }
 .hero-fx--pulse-summit-mobile-west {
 	left: 195px;
 	top: 545px;
-	animation-delay: 2.2s;
+	animation: pulse 3.4s ease-out 2.2s infinite;
 }
 .hero-fx--pulse-summit-mobile-east {
 	left: 325px;
 	top: 565px;
-	animation-delay: 3.6s;
+	animation: pulse 3.4s ease-out 3.6s infinite;
 }
 
 /* ---- Top bar ---- */
@@ -905,7 +919,11 @@ h3 {
 	html {
 		scroll-behavior: auto;
 	}
-	.skip-link {
+	/* `animation: none` above does not cover transitions. These two are the only
+	   transform-based motion on the page (the others transition colour, filter, or
+	   border-colour, which is not motion). WCAG 2.3.3. */
+	.skip-link,
+	.toggle__knob {
 		transition: none;
 	}
 }

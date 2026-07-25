@@ -155,7 +155,11 @@
 					<a href="#work">The work</a>
 					<a href="#off-the-clock">Off the clock</a>
 					<a href="#contact">Contact</a>
-					<button class="toggle" data-theme-toggle type="button" aria-label="Toggle color theme" aria-pressed="true">
+					<!-- The name says what is being toggled, not the action, so that aria-pressed
+					     means something: "Dark theme, pressed" reads as dark being on. With an
+					     action-phrased name like "Toggle color theme", the pressed state is
+					     ambiguous. ARIA APG toggle-button pattern, WCAG 4.1.2. -->
+					<button class="toggle" data-theme-toggle type="button" aria-label="Dark theme" aria-pressed="true">
 						<span class="toggle__knob"></span>
 					</button>
 				</nav>
@@ -344,7 +348,8 @@
 					<a class="btn" href="mailto:mike@robertsmj.com">Hiring? Let's talk</a>
 				</div>
 				<div class="footer__bottom">
-					<!-- LinkedIn and Resume are stubs; update with real URL/PDF before the domain goes live. -->
+					<!-- Resume is still a stub: /resume.pdf does not exist yet and 404s. Ship the
+					     PDF or drop the link. LinkedIn is live. -->
 					<div class="footer__links">
 						<a href="mailto:mike@robertsmj.com">mike@robertsmj.com</a>
 						<a href="https://github.com/robertsmikej" target="_blank" rel="noopener">GitHub</a>

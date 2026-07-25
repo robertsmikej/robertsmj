@@ -10,7 +10,8 @@ import { loadIndexPage, readPublicFile } from './helpers/page.js';
  * the initial `content` of the theme-color meta tag in index.html, which has to be
  * right before any CSS or JS has run.
  *
- * One source of truth is not achievable, so this pins all three together instead.
+ * One source of truth is not achievable, so this pins all three together, plus the
+ * fact that the page actually renders from the token rather than a literal.
  */
 
 const STYLES_CSS = readPublicFile('styles.css');
@@ -18,17 +19,23 @@ const STYLES_CSS = readPublicFile('styles.css');
 /**
  * Read a declaration out of the rule block for an exact selector.
  *
+ * Asserts the selector introduces exactly one rule block, because `String.match`
+ * returns the first hit: an earlier block (a `@media print` override, a second
+ * theme block) would otherwise silently become the thing under test.
+ *
  * @param {string} selector
  * @param {string} property
  * @returns {string}
  */
 function declaredValue(selector, property) {
-	const rule = new RegExp(`${escapeForRegExp(selector)}\\s*\\{([^}]*)\\}`);
-	const block = STYLES_CSS.match(rule);
-	if (!block) {
-		throw new Error(`No rule block found for selector "${selector}" in styles.css`);
+	// Anchored to the start of a line (Prettier puts each selector at column zero) so
+	// `body` cannot also match `.work-card__body` or `.hobby-card__body`.
+	const rule = new RegExp(`^${escapeForRegExp(selector)}\\s*\\{([^}]*)\\}`, 'gm');
+	const blocks = [...STYLES_CSS.matchAll(rule)];
+	if (blocks.length !== 1) {
+		throw new Error(`Expected exactly one rule block for "${selector}" in styles.css, found ${blocks.length}`);
 	}
-	const declaration = block[1]?.match(new RegExp(`${escapeForRegExp(property)}\\s*:\\s*([^;]+);`));
+	const declaration = blocks[0]?.[1]?.match(new RegExp(`${escapeForRegExp(property)}\\s*:\\s*([^;]+);`));
 	if (!declaration) {
 		throw new Error(`Selector "${selector}" declares no ${property}`);
 	}
@@ -59,6 +66,12 @@ describe('theme background stays consistent across CSS, JS, and HTML', () => {
 		const initial = doc.querySelector('meta[name="theme-color"]')?.getAttribute('content');
 
 		expect(initial?.toLowerCase()).toBe(THEME_BACKGROUNDS.dark.toLowerCase());
+	});
+
+	it('paints the page from the token, not a hardcoded colour', () => {
+		// Without this, all three values above can agree perfectly while the page
+		// renders from something else entirely.
+		expect(declaredValue('body', 'background')).toBe('var(--bg)');
 	});
 
 	it('applies the dark tokens to :root so a no-JS visitor gets the default theme', () => {
