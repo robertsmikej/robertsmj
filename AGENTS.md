@@ -70,10 +70,34 @@ work OAuth credentials. This site lives on the personal account. The account ID 
 pinned in `wrangler.jsonc`, and GitHub Actions has the right token, so prefer
 letting CI deploy. If you must deploy locally, export a personal API token first.
 
-**Editing the inline `<script>` in index.html breaks the CSP.** `public/_headers`
-allows it by SHA-256 hash with no `script-src 'unsafe-inline'`. Reformatting the
-HTML is enough to change the hash. `test/csp.test.js` recomputes it and fails, and
-the fix is to paste the hash from the failure into `_headers`.
+**Editing either inline `<script>` in index.html breaks the CSP.** `public/_headers`
+allows them by SHA-256 hash with no `script-src 'unsafe-inline'`. There are two: the
+no-flash theme script and the JSON-LD Person data block. The data block never
+executes, but it is still an inline `<script>` and the hash list has to cover it.
+Reformatting the HTML is enough to change a hash (Prettier formats the JSON too).
+`test/csp.test.js` recomputes both and fails, and the fix is to paste the hash from
+the failure into `_headers`. To compute them by hand:
+
+```bash
+node -e 'const h=require("fs").readFileSync("public/index.html","utf8");for(const [,s] of h.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g))console.log("sha256-"+require("crypto").createHash("sha256").update(s,"utf8").digest("base64"))'
+```
+
+**`public/og.png` is a screenshot, and it goes stale.** It is the hero captured at the
+native 1440px canvas width and downscaled to 1200x630 (the two aspect ratios agree to
+within half a percent, so nothing is stretched). It was left showing the previous
+palette, typeface, and tagline for six weeks after those changed. Whenever the hero's
+colours, type, or copy change, regenerate it: `npm run dev`, open a 1440x756 viewport,
+wait ~4s for the reveal animation to finish, screenshot, then
+`sips -z 630 1200 capture.png --out public/og.png`.
+
+**The print block must stay above the reduced-motion block in styles.css.**
+`test/stylesheet.test.js` finds the reduced-motion rules by matching from
+`@media (prefers-reduced-motion: reduce)` to the end of the file. Anything appended
+after it is read as part of that block.
+
+**Case notes are native `<details>`.** No script, so they work with the module blocked
+and cost nothing when closed. `test/markup.test.js` requires a leading `<summary>` on
+each (otherwise the UA announces a generic "Details") and that they ship closed.
 
 **That inline script duplicates `resolveTheme()` on purpose.** It has to run before
 first paint, and an ES module import would be deferred and flash the wrong theme.
@@ -130,8 +154,10 @@ and does not show it.
 
 ```
 public/            served assets
-  index.html       head, inline SVG symbol library, all sections
-  styles.css       token legend, hero canvas geometry, layout, keyframes, responsive
+  index.html       head (incl. JSON-LD Person), inline SVG symbol library, all sections:
+                   hero, What I do, Selected work (with case notes), Side projects,
+                   Off the clock, AI aside, footer
+  styles.css       token legend, hero canvas geometry, layout, keyframes, print, responsive
   theme.js         pure theme resolution, no DOM
   theme-toggle.js  DOM wiring, takes a Document so it is testable
   main.js          entry point, wiring only, no logic

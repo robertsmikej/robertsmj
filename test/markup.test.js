@@ -171,6 +171,43 @@ describe('accessibility affordances', () => {
 	});
 });
 
+describe('work and side-project cards', () => {
+	it('gives every case-notes disclosure a summary as its first child', () => {
+		// A <details> without a leading <summary> gets a UA-generated "Details" label,
+		// which is what a screen reader would announce.
+		const notes = [...doc.querySelectorAll('details.notes')];
+		expect(notes.length).toBeGreaterThan(0);
+
+		const unlabeled = notes.filter((el) => el.firstElementChild?.tagName !== 'SUMMARY');
+		expect(unlabeled).toEqual([]);
+	});
+
+	it('keeps case notes closed by default so the cards stay scannable', () => {
+		const open = [...doc.querySelectorAll('details.notes[open]')];
+		expect(open).toEqual([]);
+	});
+
+	it('links every side project over HTTPS', () => {
+		const links = [...doc.querySelectorAll('#side-projects .work-card__links a')];
+		expect(links.length).toBeGreaterThan(0);
+
+		const insecure = links.map((a) => a.getAttribute('href')).filter((href) => !href?.startsWith('https://'));
+		expect(insecure).toEqual([]);
+	});
+
+	it('gives every card a title, description, and meta line', () => {
+		const cards = [...doc.querySelectorAll('.work-card')];
+		expect(cards.length).toBeGreaterThan(4);
+
+		const parts = ['.work-card__title', '.work-card__desc', '.work-card__meta'];
+		const hasText = (/** @type {Element} */ card, /** @type {string} */ selector) =>
+			Boolean(card.querySelector(selector)?.textContent?.trim());
+		const incomplete = cards.filter((card) => !parts.every((selector) => hasText(card, selector)));
+
+		expect(incomplete).toEqual([]);
+	});
+});
+
 describe('presentation stays in the stylesheet', () => {
 	it('keeps inline style attributes out of the markup', () => {
 		// 16 hero overlay spans used to carry their geometry and timings inline. If

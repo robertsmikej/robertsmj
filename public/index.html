@@ -37,6 +37,32 @@
 		</script>
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 		<link rel="canonical" href="https://robertsmj.com/" />
+		<!-- Data block, not executable script, so the browser never runs it. It still counts as
+		     an inline <script> for the CSP hash list in public/_headers, and csp.test.js keeps
+		     the two in step. -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "Person",
+				"name": "Mike Roberts",
+				"jobTitle": "Senior full-stack engineer",
+				"url": "https://robertsmj.com/",
+				"email": "mailto:mike@robertsmj.com",
+				"image": "https://robertsmj.com/og.png",
+				"address": { "@type": "PostalAddress", "addressRegion": "ID", "addressCountry": "US" },
+				"sameAs": ["https://github.com/robertsmikej", "https://www.linkedin.com/in/robertsmichaelj/"],
+				"knowsAbout": [
+					"TypeScript",
+					"Shopify",
+					"Cloudflare Workers",
+					"React",
+					"Remix",
+					"GraphQL",
+					"Node.js",
+					"A/B testing"
+				]
+			}
+		</script>
 		<meta property="og:type" content="website" />
 		<meta property="og:title" content="Mike Roberts, senior full-stack engineer" />
 		<meta
@@ -116,6 +142,9 @@
   <symbol id="schTheme" viewBox="0 0 150 90"><g fill="none" stroke-width="1.4"><rect x="18" y="10" width="76" height="48" rx="3" style="stroke:var(--l1)"></rect><rect x="32" y="20" width="76" height="48" rx="3" style="stroke:var(--l2)"></rect><rect x="46" y="30" width="76" height="48" rx="3" style="stroke:var(--ac)"></rect><path d="M56,42 H112 M56,52 H88 M56,62 H100" style="stroke:var(--l2)"></path></g></symbol>
   <symbol id="schEdge" viewBox="0 0 150 90"><g fill="none" stroke-width="1.4"><circle cx="75" cy="45" r="16" style="stroke:var(--l2)"></circle><path d="M59,45 H91 M75,29 a10,16 0 0 1 0,32 a10,16 0 0 1 0,-32" style="stroke:var(--l1)"></path><path d="M69,31 L30,14 M91,45 L134,32 M78,60 L38,74 M59,45 L18,52" style="stroke:var(--l2)"></path><circle cx="30" cy="14" r="3" style="fill:var(--ac)" stroke="none"></circle><circle cx="134" cy="32" r="3" style="fill:var(--ac)" stroke="none"></circle><circle cx="38" cy="74" r="3" style="fill:var(--ac)" stroke="none"></circle><circle cx="18" cy="52" r="3" style="fill:var(--ac)" stroke="none"></circle></g></symbol>
   <symbol id="schMsg" viewBox="0 0 150 90"><g fill="none" stroke-width="1.4"><rect x="16" y="12" width="92" height="36" rx="7" style="stroke:var(--l2)"></rect><path d="M34,48 L34,57 L46,48" style="stroke:var(--l2)"></path><path d="M28,25 H96 M28,35 H74" style="stroke:var(--l2)"></path><rect x="58" y="54" width="76" height="28" rx="7" style="stroke:var(--ac)"></rect><path d="M118,82 L118,90 L106,82" style="stroke:var(--ac)"></path><path d="M70,65 H122 M70,73 H104" style="stroke:var(--ac)"></path></g></symbol>
+  <symbol id="schCamp" viewBox="0 0 150 90"><g fill="none" stroke-width="1.4"><path d="M6,58 L34,34 L58,52 L84,26 L108,48" style="stroke:var(--l1)"></path><path d="M26,74 H106 M38,74 L66,36 L94,74 M56,74 L66,56 L76,74" style="stroke:var(--l2)"></path><path d="M66,36 V24 L80,28 L66,32" style="stroke:var(--ac)"></path><path d="M122,32 a10,10 0 0 1 0,14 M128,26 a18,18 0 0 1 0,26" stroke-linecap="round" style="stroke:var(--ac)"></path></g><circle cx="116" cy="39" r="3" style="fill:var(--ac)"></circle></symbol>
+  <symbol id="schPlate" viewBox="0 0 150 90"><g fill="none" stroke-width="1.4" stroke-linejoin="round"><path d="M22,28 V16 H34 M116,16 H128 V28 M128,62 V74 H116 M34,74 H22 V62" style="stroke:var(--ac)"></path><rect x="40" y="31" width="70" height="28" rx="3" style="stroke:var(--l2)"></rect><path d="M50,40 V50 M57,50 L61,40 L65,50 M58.5,46 H63.5 M71,40 H78 L73,50 M85,40 V50 H91 M100,40 V46 H104 M104,40 V50" style="stroke:var(--l2)"></path></g></symbol>
+  <symbol id="schSite" viewBox="0 0 150 90"><g fill="none" stroke-width="1.4"><rect x="16" y="13" width="118" height="64" rx="4" style="stroke:var(--l2)"></rect><path d="M16,26 H134" style="stroke:var(--l2)"></path><path d="M44,50 L36,68 M44,50 L54,68 M78,42 L66,68 M78,42 L92,68 M112,46 L104,68 M112,46 L122,68" style="stroke:var(--l1)"></path><path d="M24,68 L44,50 L60,60 L78,42 L96,56 L112,46 L126,60" style="stroke:var(--ac)"></path></g><g style="fill:var(--l2)"><circle cx="24" cy="19.5" r="1.6"></circle><circle cx="30" cy="19.5" r="1.6"></circle><circle cx="36" cy="19.5" r="1.6"></circle></g><g style="fill:var(--ac)"><circle cx="44" cy="50" r="2.2"></circle><circle cx="78" cy="42" r="2.6"></circle><circle cx="112" cy="46" r="2.2"></circle></g></symbol>
   </defs>
   </svg>
 
@@ -251,6 +280,25 @@
 							<div class="work-card__meta">
 								400+ EXPERIMENTS SHIPPED &middot; MILLIONS OF SESSIONS &middot; ZERO FLICKER
 							</div>
+							<details class="notes">
+								<summary class="notes__summary">Case notes</summary>
+								<div class="notes__body">
+									<p>
+										<strong>The problem.</strong> Client-side testing tools flicker, slow the page down, and cannot be
+										trusted anywhere near checkout.
+									</p>
+									<p>
+										<strong>What I built.</strong> A TypeScript Cloudflare Worker in front of the storefront. It assigns
+										the variant at the edge and rewrites the HTML in-stream, so the visitor never sees the control
+										first. Tests target by path, geography, and device, ship with preview links for QA, and promote from
+										staging to production by pull request.
+									</p>
+									<p>
+										<strong>Why it matters.</strong> Marketing runs experiments continuously without an engineer in the
+										loop, and checkout stays out of the blast radius.
+									</p>
+								</div>
+							</details>
 						</div>
 					</article>
 					<article class="work-card">
@@ -263,6 +311,22 @@
 								One Shopify theme architecture powering multiple brands from a single codebase.
 							</p>
 							<div class="work-card__meta">ONE CODEBASE &middot; EVERY BRAND &middot; SHOPIFY / LIQUID</div>
+							<details class="notes">
+								<summary class="notes__summary">Case notes</summary>
+								<div class="notes__body">
+									<p>
+										<strong>The problem.</strong> Several brands, each on its own copy of the theme, drifting apart one
+										fix at a time.
+									</p>
+									<p>
+										<strong>What I built.</strong> One brand-agnostic theme with per-brand configuration layered on top.
+										A change lands once on the shared branch and fans out to every brand's branch and pull request
+										automatically, so a fix ships everywhere or nowhere. Includes a WCAG 2.1 AA accessibility pass
+										across the theme and a native cart drawer that replaced a third-party app.
+									</p>
+									<p><strong>Why it matters.</strong> New brands launch on a proven codebase instead of a fork.</p>
+								</div>
+							</details>
 						</div>
 					</article>
 					<article class="work-card">
@@ -275,6 +339,24 @@
 								Cloudflare Workers services for routing, personalization, and analytics capture.
 							</p>
 							<div class="work-card__meta">CLOUDFLARE WORKERS &middot; ROUTING &middot; PERSONALIZATION</div>
+							<details class="notes">
+								<summary class="notes__summary">Case notes</summary>
+								<div class="notes__body">
+									<p>
+										<strong>The problem.</strong> Shopify decides a lot for you. The rules a business actually needs
+										live in the gaps.
+									</p>
+									<p>
+										<strong>What I built.</strong> Cloudflare Workers for request routing, personalization, and
+										first-party analytics capture, alongside Shopify Functions and Admin API apps for the shipping and
+										checkout rules the platform cannot express natively.
+									</p>
+									<p>
+										<strong>Why it matters.</strong> Business rules live in tested, deployed code instead of a stack of
+										apps and manual workarounds.
+									</p>
+								</div>
+							</details>
 						</div>
 					</article>
 					<article class="work-card">
@@ -288,6 +370,80 @@
 								React, Redux, and Apollo GraphQL subscriptions.
 							</p>
 							<div class="work-card__meta">89,000 USERS &middot; REAL-TIME &middot; REACT / GRAPHQL</div>
+							<details class="notes">
+								<summary class="notes__summary">Case notes</summary>
+								<div class="notes__body">
+									<p>
+										<strong>The problem.</strong> The brand's community lived in a Facebook group it did not control.
+									</p>
+									<p>
+										<strong>What I built.</strong> A real-time messaging app of its own: React and Redux on the client,
+										Apollo GraphQL subscriptions pushing new messages live.
+									</p>
+									<p>
+										<strong>Why it matters.</strong> Tens of thousands of members moved onto a platform the brand owns,
+										data included.
+									</p>
+								</div>
+							</details>
+						</div>
+					</article>
+				</div>
+			</section>
+
+			<hr class="rule" />
+
+			<section class="wrap" id="side-projects" aria-labelledby="side-h">
+				<h2 class="kicker" id="side-h">Side projects</h2>
+				<div class="work-list">
+					<article class="work-card">
+						<svg width="150" height="90" viewBox="0 0 150 90" aria-hidden="true" focusable="false">
+							<use href="#schCamp"></use>
+						</svg>
+						<div class="work-card__body">
+							<h3 class="work-card__title">CampWatch</h3>
+							<p class="work-card__desc">
+								Popular recreation.gov campgrounds sell out minutes after release. CampWatch watches the sites you
+								actually want and emails you the moment one opens, usually within ten seconds.
+							</p>
+							<div class="work-card__meta">
+								NEXT.JS / CLOUDFLARE WORKERS &middot; CRON NOTIFIER &middot; OPEN SOURCE
+							</div>
+							<div class="work-card__links">
+								<a href="https://campwatch.dev" target="_blank" rel="noopener">campwatch.dev &nearr;</a>
+								<a href="https://github.com/robertsmikej/campsites-react" target="_blank" rel="noopener"
+									>Source &nearr;</a
+								>
+							</div>
+						</div>
+					</article>
+					<article class="work-card">
+						<svg width="150" height="90" viewBox="0 0 150 90" aria-hidden="true" focusable="false">
+							<use href="#schPlate"></use>
+						</svg>
+						<div class="work-card__body">
+							<h3 class="work-card__title">Sentry, a license plate scanner</h3>
+							<p class="work-card__desc">
+								A free, offline-first plate scanner for neighborhood watch. Plates are read on-device with OCR, or with
+								Gemini when online, and stay on your phone unless you sync them to your own Google Sheet.
+							</p>
+							<div class="work-card__meta">PWA &middot; OFFLINE-FIRST &middot; OPEN SOURCE</div>
+							<div class="work-card__links">
+								<a href="https://github.com/robertsmikej/Sentry" target="_blank" rel="noopener">Source &nearr;</a>
+							</div>
+						</div>
+					</article>
+					<article class="work-card">
+						<svg width="150" height="90" viewBox="0 0 150 90" aria-hidden="true" focusable="false">
+							<use href="#schSite"></use>
+						</svg>
+						<div class="work-card__body">
+							<h3 class="work-card__title">This site</h3>
+							<p class="work-card__desc">
+								No framework, no build step, no third-party requests. The hero scales in pure CSS, the one inline script
+								is allowed by CSP hash rather than 'unsafe-inline', and a hundred-plus tests gate every deploy.
+							</p>
+							<div class="work-card__meta">LIGHTHOUSE 100 &middot; CSP BY HASH &middot; ZERO DEPENDENCIES</div>
 						</div>
 					</article>
 				</div>
@@ -367,8 +523,8 @@
 					     hiring page. test/markup.test.js fails if a footer link 404s again. -->
 					<div class="footer__links">
 						<a href="mailto:mike@robertsmj.com">mike@robertsmj.com</a>
-						<a href="https://github.com/robertsmikej" target="_blank" rel="noopener">GitHub</a>
-						<a href="https://www.linkedin.com/in/robertsmichaelj/" target="_blank" rel="noopener">LinkedIn</a>
+						<a href="https://github.com/robertsmikej" target="_blank" rel="me noopener">GitHub</a>
+						<a href="https://www.linkedin.com/in/robertsmichaelj/" target="_blank" rel="me noopener">LinkedIn</a>
 					</div>
 					<span class="footer__copy">&copy; 2026 MIKE ROBERTS, TREASURE VALLEY, IDAHO</span>
 				</div>
