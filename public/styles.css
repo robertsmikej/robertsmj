@@ -141,6 +141,12 @@ h2,
 h3 {
 	margin: 0;
 }
+/* Browser defaults belong to no design. Selection takes the accent so highlighted
+   text reads as part of the page in both themes. */
+::selection {
+	background: var(--ac);
+	color: var(--cta-tx);
+}
 
 /* ---- Focus ----
    The design handoff specifies no focus treatment, which left keyboard users with
@@ -791,6 +797,82 @@ h3 {
 	color: var(--ac);
 	letter-spacing: 0.1em;
 }
+.work-card__links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 22px;
+	margin-top: 4px;
+}
+.work-card__links a {
+	font:
+		400 13px/1 'IBM Plex Mono',
+		monospace;
+	color: var(--tx);
+	border-bottom: 1px solid var(--l2);
+	padding-bottom: 3px;
+	transition:
+		color 0.15s ease,
+		border-color 0.15s ease;
+}
+.work-card__links a:hover {
+	color: var(--ac);
+	border-color: var(--ac);
+}
+
+/* ---- Case notes ----
+   Native <details>, so the expanded state needs no script and works with the module
+   blocked. The summary is the only control on a card, and the 8px vertical padding
+   lifts its hit area past the 24px WCAG 2.5.8 minimum. */
+.notes {
+	margin-top: 2px;
+}
+.notes__summary {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	list-style: none;
+	cursor: pointer;
+	padding: 8px 0;
+	font:
+		600 11px/1 'IBM Plex Mono',
+		monospace;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--tx2);
+	transition: color 0.15s ease;
+}
+.notes__summary::-webkit-details-marker {
+	display: none;
+}
+.notes__summary::after {
+	content: '+';
+	font-size: 14px;
+	color: var(--ac);
+}
+.notes[open] .notes__summary::after {
+	content: '\2212';
+}
+.notes__summary:hover {
+	color: var(--tx);
+}
+.notes__body {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 6px 0 4px;
+	max-width: 62ch;
+}
+.notes__body p {
+	margin: 0;
+	font:
+		400 14px/1.65 'Instrument Sans',
+		sans-serif;
+	color: var(--tx2);
+}
+.notes__body strong {
+	font-weight: 600;
+	color: var(--tx);
+}
 @media (max-width: 768px) {
 	.content {
 		padding: 80px 0 0;
@@ -960,6 +1042,53 @@ h3 {
 	.footer__links {
 		flex-wrap: wrap;
 		gap: 16px 28px;
+	}
+}
+
+/* ---- Print ----
+   A hiring page gets printed. Light tokens regardless of the chosen theme, no
+   animated artwork, no interactive controls, and external link targets spelled out
+   since paper cannot be clicked. Sits above the reduced-motion block on purpose:
+   test/stylesheet.test.js reads that block as the tail of the file. */
+@media print {
+	:root {
+		--bg: #ffffff;
+		--l1: #d3dce2;
+		--l2: #8299a8;
+		--ac: #14688b;
+		--tx: #182029;
+		--tx2: #556572;
+	}
+	.skip-link,
+	.hero__art,
+	.toggle,
+	.textlink,
+	.btn,
+	.footer__ridge {
+		display: none;
+	}
+	.hero {
+		min-height: 0;
+	}
+	.hero__content {
+		margin-top: 32px;
+		padding-bottom: 16px;
+	}
+	.content {
+		padding-top: 40px;
+	}
+	.rule {
+		margin: 40px auto;
+	}
+	.work-card,
+	.hobby-card {
+		break-inside: avoid;
+	}
+	.work-card__links a::after,
+	.footer__links a[href^='http']::after {
+		content: ' (' attr(href) ')';
+		font-size: 11px;
+		color: var(--tx2);
 	}
 }
 

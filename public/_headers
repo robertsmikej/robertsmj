@@ -18,11 +18,13 @@
 # an injected inline <style> element is blocked. Engines without the directive ignore
 # it and behave exactly as before.
 #
-# The script hash below must match the inline <script> in index.html byte for byte.
-# test/csp.test.js recomputes it from the HTML and fails if they drift.
+# The script hashes below must match the inline <script> blocks in index.html byte for
+# byte: the first is the no-flash theme script, the second the JSON-LD data block
+# (never executed, but it is still an inline <script> and csp.test.js counts it).
+# The test recomputes both from the HTML and fails if they drift.
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-0NP5ykYNoOaj2DhjvQctX0k/yltI6arlX1LJpDSNADU='; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-0NP5ykYNoOaj2DhjvQctX0k/yltI6arlX1LJpDSNADU=' 'sha256-C5job7UZQfhEKj5SqHEEJQUjB9tQhY2SBc8vbQobQCg='; style-src 'self' 'unsafe-inline'; style-src-elem 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'
   Referrer-Policy: strict-origin-when-cross-origin
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
