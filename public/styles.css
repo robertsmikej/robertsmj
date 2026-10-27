@@ -838,8 +838,13 @@ h3 {
 		monospace;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	color: var(--tx2);
-	transition: color 0.15s ease;
+	color: var(--ac);
+	text-decoration: underline;
+	text-decoration-color: color-mix(in srgb, var(--ac) 40%, transparent);
+	text-underline-offset: 4px;
+	transition:
+		color 0.15s ease,
+		text-decoration-color 0.15s ease;
 }
 .notes__summary::-webkit-details-marker {
 	display: none;
@@ -853,7 +858,7 @@ h3 {
 	content: '\2212';
 }
 .notes__summary:hover {
-	color: var(--tx);
+	text-decoration-color: var(--ac);
 }
 .notes__body {
 	display: flex;
